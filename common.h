@@ -10,7 +10,10 @@
 #define DATA_BLOCK_SIZE 128
 #define DATA_BLOCK_NUMBER 13
 #define FILE_SYSTEM_ALREADY_INITIALIZED 67895
+#define FILE_SYSTEM_NOT_INITIALIZED 89702
 
+#define NO_OF_INODES 1024
+#define NO_OF_DATA_BLOCKS 1024
 
 // just buffer
 typedef struct DATABLOCK
@@ -42,8 +45,8 @@ typedef struct SUPERBLOCK
     int freeDataBlockCount;
 
     // lists
-    int* inodeList;
-    int* dataBlockList;
+    int inodeList[NO_OF_INODES];
+    int dataBlockList[NO_OF_DATA_BLOCKS];
 
     int iNodeSize;
     int dataBlockSize;
@@ -51,8 +54,9 @@ typedef struct SUPERBLOCK
 
 typedef struct WHOLEFS
 {
-    SuperBlock* sb;
-    DataBlock* db;
-    Inode* ib;
+    SuperBlock sb;
+    DataBlock db[NO_OF_DATA_BLOCKS];
+    Inode ib[NO_OF_INODES];
 }WholeFS;
+
 #endif
