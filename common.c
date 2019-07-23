@@ -20,7 +20,7 @@ void initFS()
 * It also changes the starting code to mark the changes
 */
 
-void readFS()
+WholeFS* readFS()
 {
     // check if its a fresh copy
     FILE *fp = fopen("/tmp/S3R.fs", "r+");
@@ -32,9 +32,10 @@ void readFS()
     fscanf(fp,"%d",&tmp);
     printf("%d",tmp);
 
+    WholeFS* fs = NULL:
     if(tmp==code) // fresh
     {
-        WholeFS* fs = calloc(1,sizeof(WholeFS));
+        fs = calloc(1,sizeof(WholeFS));
         if(fs==NULL)
             assert(0);
         
@@ -65,12 +66,33 @@ void readFS()
         //printf("\nFile pointer position : %ld",ftell(fp));
         
     }
-    else
+    else // read from the file to memory structure
     {
         
     }
     
     fclose(fp);
+    return fs;
+}
+
+// set the file mode(file or folder) at the given index
+void writeInode(WholeFS* fs,int index,int mode)
+{
+    fs->ib[index].fileMode = mode;
+    fs->ib[index].linkCount = 1;
+
+}
+
+void writeDataBlock(WholeFS* fs,int index,char* content,int len)
+{
+    assert(len<=DATA_BLOCK_SIZE);
+    DataBlock db = fs->db[index];
+
+    int i;
+    for(i=0;i<len;i++)
+    {
+        db[i] = content[i];
+    }
 }
 
 void writeFS()
