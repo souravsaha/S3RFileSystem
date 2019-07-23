@@ -3,22 +3,24 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 
-#define SIZE 20*1024
+
+#define SIZE 1024*1024
 #define DATA_BLOCK_SIZE 16
 #define DATA_BLOCK_NUMBER 13
 
-typedef struct DataBlock
+typedef struct DATABLOCK
 {
     char content[DATA_BLOCK_SIZE];
-};
+}DataBlock;
 
-typedef struct DataAccess
+typedef struct DATAACCESS
 {
     int dbIndex[DATA_BLOCK_NUMBER];
-};
+}DataAccess;
 
-typedef struct Inode
+typedef struct INODE
 {
     int fileMode;
     int linkCount;
@@ -26,9 +28,9 @@ typedef struct Inode
     
     DataAccess* da;
 
-};
+}Inode;
 
-typedef struct SuperBlock
+typedef struct SUPERBLOCK
 {
     // int magic;
 
@@ -46,7 +48,7 @@ typedef struct SuperBlock
 
     int iNodeSize;
     int dataBlockSize;
-};
+}SuperBlock;
 
 
 #endif
