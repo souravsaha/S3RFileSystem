@@ -4,21 +4,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
-
+#include <assert.h>
 
 #define SIZE 1024*1024
-#define DATA_BLOCK_SIZE 16
+#define DATA_BLOCK_SIZE 128
 #define DATA_BLOCK_NUMBER 13
+#define FILE_SYSTEM_ALREADY_INITIALIZED 67895
 
+
+// just buffer
 typedef struct DATABLOCK
 {
     char content[DATA_BLOCK_SIZE];
 }DataBlock;
 
-typedef struct DATAACCESS
-{
-    int dbIndex[DATA_BLOCK_NUMBER];
-}DataAccess;
 
 typedef struct INODE
 {
@@ -26,7 +25,7 @@ typedef struct INODE
     int linkCount;
     int blocksCount;
     
-    DataAccess* da;
+    int dbIndex[DATA_BLOCK_NUMBER];
 
 }Inode;
 
@@ -50,5 +49,10 @@ typedef struct SUPERBLOCK
     int dataBlockSize;
 }SuperBlock;
 
-
+typedef struct WHOLEFS
+{
+    SuperBlock* sb;
+    DataBlock* db;
+    Inode* ib;
+}WholeFS;
 #endif
