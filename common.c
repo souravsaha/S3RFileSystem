@@ -56,6 +56,8 @@ WholeFS* readFS()
         fs->sb.iNodeOffset = SIZE - (dataBlockNum*DATA_BLOCK_SIZE + noOfInodes*sizeOfINodes)+sizeof(int);
         fs->sb.dataBlockOffset = fs->sb.iNodeOffset+fs->sb.inodeCount*fs->sb.iNodeSize;
 
+        /*TODO root inode need to be initialized */
+
         // write to beginning of file that the filesystem has already been written
         //printf("\nFile pointer position : %ld",ftell(fp));
         fseek(fp,0,SEEK_SET);
