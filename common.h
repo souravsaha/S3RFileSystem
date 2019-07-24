@@ -22,6 +22,7 @@
 #define FREE 0
 #define OCCUPIED 1
 
+#define DIRECTORY_ENTRY_LENGTH 16
 // just buffer
 typedef struct DATABLOCK
 {
