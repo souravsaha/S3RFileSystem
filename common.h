@@ -8,12 +8,18 @@
 
 #define SIZE 1024*1024
 #define DATA_BLOCK_SIZE 128
-#define DATA_BLOCK_NUMBER 13
+#define DIRECT_DATA_BLOCK_NUMBER 32
 #define FILE_SYSTEM_ALREADY_INITIALIZED 67895
 #define FILE_SYSTEM_NOT_INITIALIZED 89702
 
 #define NO_OF_INODES 1024
 #define NO_OF_DATA_BLOCKS 1024
+
+#define FILE_MODE 0
+#define FOLDER_MODE 1
+
+#define FREE 0
+#define OCCUPIED 1
 
 // just buffer
 typedef struct DATABLOCK
@@ -24,11 +30,23 @@ typedef struct DATABLOCK
 
 typedef struct INODE
 {
-    int fileMode;
-    int linkCount;
-    int blocksCount;
+    int fileMode; // file or directory
+    int linkCount; // no of open instances
+    int fileSize; // file size in bytes
     
-    int dbIndex[DATA_BLOCK_NUMBER];
+    /*Later purpose */
+
+    /*
+    int uid;
+    int gid;
+    time_t aTime;
+    time_t mTime;
+    time_t cTime;
+     */
+
+    // list of data blocks
+    int directDBIndex[DIRECT_DATA_BLOCK_NUMBER];
+    //int indirect2DBIndex[2ND_DIRECT_DATA_BLOCK_NUMBER];
 
 }Inode;
 

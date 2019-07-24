@@ -32,7 +32,7 @@ WholeFS* readFS()
     fscanf(fp,"%d",&tmp);
     printf("%d",tmp);
 
-    WholeFS* fs = NULL:
+    WholeFS* fs = NULL;
     if(tmp==code) // fresh
     {
         fs = calloc(1,sizeof(WholeFS));
@@ -75,6 +75,7 @@ WholeFS* readFS()
     return fs;
 }
 
+
 // set the file mode(file or folder) at the given index
 void writeInode(WholeFS* fs,int index,int mode)
 {
@@ -83,7 +84,8 @@ void writeInode(WholeFS* fs,int index,int mode)
 
 }
 
-void writeDataBlock(WholeFS* fs,int index,char* content,int len)
+// given the data block and its index, writes it into the memory
+void writeDataBlock(WholeFS* fs,int index,int offset,char* content,int len)
 {
     assert(len<=DATA_BLOCK_SIZE);
     DataBlock db = fs->db[index];
@@ -91,9 +93,80 @@ void writeDataBlock(WholeFS* fs,int index,char* content,int len)
     int i;
     for(i=0;i<len;i++)
     {
-        db[i] = content[i];
+        db.content[i+offset] = content[i];
     }
 }
+
+DataBlock* readDataBlock(WholeFS* fs,int index)
+{
+    return &(fs->db[index]);
+}
+
+// find the first free inode from freelist
+int getFirstFreeInode(WholeFS* fs)
+{
+    int i;
+    // first two inodes are reserved
+    for(i=2;i<fs->sb.inodeCount;i++)
+    {
+        if(fs->sb.inodeList[i]==FREE)
+        {
+            fs->sb.inodeList[i] = OCCUPIED;
+            return i;
+        }
+    }
+    assert(0);
+}
+
+// uses current working directory to get parent inode index 
+int getParentInode(WholeFS* fs)
+{
+    return 1;
+}
+
+Inode* getInode(WholeFS* fs,int index)
+{
+    return &(fs->ib[index]);
+}
+
+void system_touch(WholeFS* fs,char* name)
+{
+    // get free inode
+    int index = getFirstFreeInode(fs);
+    
+    // TODO : get the parent directory inode no
+    int parent = getParentInode(fs);
+
+    // write into data block of parent
+    // assuming everything is in direct block
+    Inode* parentInode = getInode(fs,parent);
+    int blockNo = parentInode->fileSize/DATA_BLOCK_SIZE;
+    int blockOffset = parentInode->fileSize%DATA_BLOCK_SIZE;
+
+    assert(blockNo<DIRECT_DATA_BLOCK_NUMBER);
+
+    // add a 16byte entry in the parent directory
+
+    char buffer[16];
+    sprintf(buffer,"%d %s\n",parent,name);
+
+    // still can append in the last block
+    if(blockOffset+16<DATA_BLOCK_SIZE)
+    {
+        // write to the specific data block
+        writeDataBlock(fs,blockNo,blockOffset,buffer,16);
+        DataBlock* d = readDataBlock(fs,blockNo);
+
+        printf("%s\n",d->content);
+        // print the content of the block 
+
+    }else // new bloxk neededxxxxxxx
+    {
+        assert(0);
+    }
+
+}
+
 
 void writeFS()
 {
@@ -103,6 +176,7 @@ void writeFS()
 int main()
 {
     initFS();
-    readFS();
+    WholeFS* fs = readFS();
+    system_touch(fs,"try.txt");
     return 0;
 }
