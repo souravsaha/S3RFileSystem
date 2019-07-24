@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <string.h>
 
 #define SIZE 1024*1024
 #define DATA_BLOCK_SIZE 128

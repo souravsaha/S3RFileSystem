@@ -30,7 +30,7 @@ WholeFS* readFS()
     //read the starting char
     //fseek(fp,0,SEEK_SET);
     fscanf(fp,"%d",&tmp);
-    printf("%d",tmp);
+    //printf("%d",tmp);
 
     WholeFS* fs = NULL;
     if(tmp==code) // fresh
@@ -88,35 +88,63 @@ void writeInode(WholeFS* fs,int index,int mode)
 void writeDataBlock(WholeFS* fs,int index,int offset,char* content,int len)
 {
     assert(len<=DATA_BLOCK_SIZE);
-    DataBlock db = fs->db[index];
-
+    DataBlock* db = &(fs->db[index]);
+    //printf("\n add: %u",db);
     int i;
     for(i=0;i<len;i++)
     {
-        db.content[i+offset] = content[i];
+        db->content[i+offset] = content[i];
     }
 }
 
 DataBlock* readDataBlock(WholeFS* fs,int index)
 {
+    //printf("\n add: %u",&(fs->db[index]));
     return &(fs->db[index]);
 }
 
-// find the first free inode from freelist
-int getFirstFreeInode(WholeFS* fs)
+// find the first free inode index from freelist
+// mark it allocated
+int getFirstFreeInodeIndex(WholeFS* fs)
 {
     int i;
+    if(fs->sb.freeInodeCount==0)
+        assert(0);
+
     // first two inodes are reserved
     for(i=2;i<fs->sb.inodeCount;i++)
     {
         if(fs->sb.inodeList[i]==FREE)
         {
             fs->sb.inodeList[i] = OCCUPIED;
+            fs->sb.freeInodeCount--;
             return i;
         }
     }
     assert(0);
 }
+
+// find the first free data block index from freelist
+// mark it allocated
+int getFirstFreeDataBlockIndex(WholeFS* fs)
+{
+    int i;
+    if(fs->sb.freeDataBlockCount==0)
+        assert(0);
+        
+    // first two data blocks are reserved
+    for(i=2;i<fs->sb.dataBlockCount;i++)
+    {
+        if(fs->sb.dataBlockList[i]==FREE)
+        {
+            fs->sb.dataBlockList[i] = OCCUPIED;
+            fs->sb.freeDataBlockCount--;
+            return i;
+        }
+    }
+    assert(0);
+}
+
 
 // uses current working directory to get parent inode index 
 int getParentInode(WholeFS* fs)
@@ -129,38 +157,92 @@ Inode* getInode(WholeFS* fs,int index)
     return &(fs->ib[index]);
 }
 
+int isDBlockFree(Inode* i,int index)
+{
+    // check if the list of data block indexes in inode is 
+    return i->directDBIndex[index]==FREE;
+}
+// calculate block number and offset to write data into
+// if ending of the block is reached new block allocated
+void calculateDataBlockNoAndOffsetToWrite(WholeFS* fs,Inode* i,int* index,int* offset)
+{
+    int blockIndexInInode = i->fileSize/DATA_BLOCK_SIZE;
+    int blockOffset = i->fileSize%DATA_BLOCK_SIZE;
+    int idx = i->directDBIndex[blockIndexInInode];
+    if(blockIndexInInode>=DIRECT_DATA_BLOCK_NUMBER)
+        assert(0); // just to avoid double links
+    
+
+    if(blockOffset == 0) // need to write at data block beginning
+    {
+        // check if the block is already allocated or not
+        if(isDBlockFree(i,blockIndexInInode))
+        {
+           idx = getFirstFreeDataBlockIndex(fs);
+           i->directDBIndex[blockIndexInInode] = idx;
+        }
+
+    }
+    
+    *index = idx;
+    *offset = blockOffset;
+    
+}
+
 void system_touch(WholeFS* fs,char* name)
 {
-    // get free inode
-    int index = getFirstFreeInode(fs);
+    /*Make the file */
     
+    int index = getFirstFreeInodeIndex(fs); // get free inode
+    fs->ib[index].fileMode = FILE_MODE; // this is a file
+    fs->ib[index].fileSize = 0;
+    fs->ib[index].linkCount = 1;
+
+    /* Add an entry in parent */
     // TODO : get the parent directory inode no
     int parent = getParentInode(fs);
 
     // write into data block of parent
     // assuming everything is in direct block
     Inode* parentInode = getInode(fs,parent);
-    int blockNo = parentInode->fileSize/DATA_BLOCK_SIZE;
-    int blockOffset = parentInode->fileSize%DATA_BLOCK_SIZE;
+    
+    /* This is a temporary solution.. 
+        Write a function like write buffer that uses a while loop to write data to
+        data buffers where data may not fit in a single data block
+        can be written simply by using existing functions "calculateDataBlockNoAndOffsetToWrite" and 
+        code from this function
+     */
 
+    int blockNo,blockOffset;
+
+    calculateDataBlockNoAndOffsetToWrite(fs,parentInode,&blockNo,&blockOffset);
+    
     assert(blockNo<DIRECT_DATA_BLOCK_NUMBER);
 
     // add a 16byte entry in the parent directory
+    printf("\nblockNo = %d offset= %d\n",blockNo,blockOffset);
 
     char buffer[16];
     sprintf(buffer,"%d %s\n",parent,name);
-
+    
     // still can append in the last block
     if(blockOffset+16<DATA_BLOCK_SIZE)
     {
         // write to the specific data block
         writeDataBlock(fs,blockNo,blockOffset,buffer,16);
-        DataBlock* d = readDataBlock(fs,blockNo);
 
+        // increase the file size
+        
+        parentInode->fileSize += strlen(buffer);
+        
+
+        DataBlock* d = readDataBlock(fs,blockNo);
+        
+        //printf("\n add: %u",d);
         printf("%s\n",d->content);
         // print the content of the block 
 
-    }else // new bloxk neededxxxxxxx
+    }else // new bloxk needed
     {
         assert(0);
     }
@@ -178,5 +260,6 @@ int main()
     initFS();
     WholeFS* fs = readFS();
     system_touch(fs,"try.txt");
+    system_touch(fs,"lol.2");
     return 0;
 }
