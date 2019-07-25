@@ -4,8 +4,9 @@ int getPwdInodeNumber(WholeFS* fs)
 {
     return 1;
 }
-// TODO take filesize as argument
-// 
+
+
+// TODO take filesize as argument 
 void initFS()
 {
     FILE *fp = fopen("S3R.fs", "w+");
@@ -157,6 +158,7 @@ int getFirstFreeDataBlockIndex(WholeFS* fs)
 
 
 // uses current working directory to get parent inode index 
+// returns inode index of the parent directory
 int getParentInode(WholeFS* fs)
 {
     return 1;
@@ -198,6 +200,54 @@ void calculateDataBlockNoAndOffsetToWrite(WholeFS* fs,Inode* i,int inodeIndex, i
     
     *index = idx;
     *offset = blockOffset;
+    
+}
+
+// given a block, searches filename in the block
+// returns the offset where the block is found 
+// else -1
+int searchFilenameInDataBlock(DataBlock* db,char* name,int len)
+{
+    return -1;
+}
+
+int system_rm(WholeFS* fs,char* name,int len)
+{
+    // get current inode number of current working directory
+    int dirInode = getPwdInodeNumber(fs);
+    // get Inode of the pwd directory
+    Inode* parentDirInode = getInode(fs,dirInode);
+    int totalBlocksOccupied = parentDirInode->fileSize/DATA_BLOCK_SIZE;
+    
+    // get the data block of the directory files 
+    int isFileDeleted = 0;
+
+    while(!isFileDeleted)
+    {
+        int i=0;
+        // iterate through the directory data blocks in search of 
+        // the line containing the filename
+        for(i=0;i<totalBlocksOccupied;i++)
+        {
+            DataBlock* db = &(fs->db[i]);
+
+            // read every 16 bit line from the data block and
+            // check if there is a match
+            int blockOffset = searchFilenameInDataBlock(db,name,len);
+            if(blockOffset != -1)
+            {
+                // write the inode no 0 at offset
+                // inode_no filename --> 0 filename
+                // TODO
+                isFileDeleted = 1;
+                break;
+            }
+        }
+    }
+    if(isFileDeleted)
+        return 1;  // modify if needed
+    else
+        return 0;
     
 }
 
@@ -337,6 +387,13 @@ int main()
     int inodeIndex;
     initFS();
     WholeFS* fs = readFS();
+    printf("*********************************************************\n");
+    printf("wholefs = %ld\n",sizeof(WholeFS));
+    printf("superBlock = %ld\n",sizeof(SuperBlock));
+    printf("Inode: %ld\n",sizeof(Inode));
+    printf("Datablock: %ld\n",sizeof(DataBlock));
+    printf("*********************************************************\n");
+
     inodeIndex = system_touch(fs,"try1.txt");
     writeFS(fs, inodeIndex);
     inodeIndex = system_touch(fs,"try2.txt");
