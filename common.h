@@ -24,13 +24,13 @@
 
 #define DIRECTORY_ENTRY_LENGTH 16
 // just buffer
-typedef struct DATABLOCK
+typedef struct DATABLOCK // size = 128
 {
     char content[DATA_BLOCK_SIZE];
 }DataBlock;
 
 
-typedef struct INODE
+typedef struct INODE // 140 (35*4)
 {
     int fileMode; // file or directory
     int linkCount; // no of open instances
@@ -52,7 +52,7 @@ typedef struct INODE
 
 }Inode;
 
-typedef struct SUPERBLOCK
+typedef struct SUPERBLOCK // size (8+1024+1024)*sizeof(int) = 8224
 {
     // int magic;
 
@@ -60,6 +60,7 @@ typedef struct SUPERBLOCK
     int inodeCount;
     int freeInodeCount;
     int iNodeOffset;
+    
     int dataBlockOffset;
     int dataBlockCount;
     int freeDataBlockCount;
