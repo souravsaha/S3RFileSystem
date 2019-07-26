@@ -26,7 +26,7 @@
 #define Malloc(n,type) (type *) malloc( (unsigned) ((n)*sizeof(type)))
 
 #define DIRECTORY_ENTRY_LENGTH 16
-#define FILE_NAME "temp.txt"
+#define FILE_NAME "S3R.fs"
 
 /* Define some specific offsets for file handling 
 #define INTEGER_SIZE 4
@@ -98,7 +98,26 @@ typedef struct WHOLEFS
     Inode ib[NO_OF_INODES];
     char* fileSystemName;
     DataBlock db[NO_OF_DATA_BLOCKS];
-    
+    int pwdInodeNumber;
+
 }WholeFS;
+
+Inode* strToInode(char* buffer,int len);
+int getPwdInodeNumber(WholeFS* fs);
+Inode* strToInode(char* buffer,int len);
+WholeFS* readFS(char *fileName);
+void writeInode(WholeFS* fs,int index,int mode);
+void writeDataBlock(WholeFS* fs,int index,int offset,char* content,int len);
+DataBlock* readDataBlock(WholeFS* fs,int index);
+int getFirstFreeInodeIndex(WholeFS* fs);
+int getFirstFreeDataBlockIndex(WholeFS* fs);
+int getParentInode(WholeFS* fs);
+Inode* getInode(WholeFS* fs,int index);
+
+int isDBlockFree(Inode* i,int index);
+void calculateDataBlockNoAndOffsetToWrite(WholeFS* fs,Inode* i,int inodeIndex, int* index,int* offset);
+int searchFilenameInDataBlock(char* db,char* name,int len);
+int getDBlockNumberFromSize(int size);
+void writeFS(WholeFS *fs, int inodeIndex);
 
 #endif
