@@ -6,9 +6,9 @@ int getPwdInodeNumber(WholeFS* fs)
 }
 // TODO take filesize as argument
 // 
-void initFS()
+void initFS(char *fileName)
 {
-    FILE *fp = fopen("S3R.fs", "w+");
+    FILE *fp = fopen(fileSystemName, "w+");
     int code = FILE_SYSTEM_NOT_INITIALIZED;
 
     fprintf(fp,"%d",code);
@@ -23,10 +23,10 @@ void initFS()
 * It also changes the starting code to mark the changes
 */
 
-WholeFS* readFS()
+WholeFS* readFS(char *fileName)
 {
     // check if its a fresh copy
-    FILE *fp = fopen("S3R.fs", "r+");
+    FILE *fp = fopen(fileName, "r+");
     int code = FILE_SYSTEM_NOT_INITIALIZED;
     int tmp;
 
@@ -36,6 +36,8 @@ WholeFS* readFS()
     //printf("%d",tmp);
 
     WholeFS* fs = NULL;
+    fs->fileSystemName = Malloc(512, char);
+    strcpy(fs->fileSystemName, fileName);
     if(tmp==code) // fresh
     {
         fs = calloc(1,sizeof(WholeFS));
@@ -155,7 +157,7 @@ int getFirstFreeDataBlockIndex(WholeFS* fs)
     assert(0);
 }
 
-
+/* TODO complete the function */
 // uses current working directory to get parent inode index 
 int getParentInode(WholeFS* fs)
 {
@@ -202,14 +204,14 @@ void calculateDataBlockNoAndOffsetToWrite(WholeFS* fs,Inode* i,int inodeIndex, i
 }
 
 
-int system_touch(WholeFS* fs,char* name)
+int system_touch(WholeFS* fs,char* name, int fileType)
 {
     /*Make the file */
     
     int inodeIndex = getFirstFreeInodeIndex(fs); // get free inode
     
     fs->sb.inodeList[inodeIndex] = OCCUPIED;
-    fs->ib[inodeIndex].fileMode = FILE_MODE; // this is a file
+    fs->ib[inodeIndex].fileMode = fileType; // this is a file / directory
     fs->ib[inodeIndex].fileSize = 0;
     fs->ib[inodeIndex].linkCount = 1;
     fs->sb.freeInodeCount--;
@@ -268,7 +270,7 @@ int system_touch(WholeFS* fs,char* name)
     //printf("Direct DB Index, inode index : %d, value = %d\n", inodeIndex, fs->ib[inodeIndex].directDBIndex[0]);
     return inodeIndex;
 }
-
+/* TODO complete the function */
 int getDBlockNumberFromSize(int size)
 {
     return 0;
@@ -276,7 +278,7 @@ int getDBlockNumberFromSize(int size)
 
 void writeFS(WholeFS *fs, int inodeIndex)
 {
-    FILE *fp = fopen("S3R.fs", "r+");
+    FILE *fp = fopen(fs->fileSystemName, "r+");
     int rootInodeIndex =  getPwdInodeNumber(fs);
     int offset = fs->ib[rootInodeIndex].fileSize % DATA_BLOCK_SIZE;
     int i;
@@ -332,14 +334,20 @@ void writeFS(WholeFS *fs, int inodeIndex)
     fclose(fp);
 }
 
-int main()
+int system_mkdir(WholeFS* fs,char* name, int fileType)
 {
-    int inodeIndex;
-    initFS();
-    WholeFS* fs = readFS();
-    inodeIndex = system_touch(fs,"try1.txt");
-    writeFS(fs, inodeIndex);
-    inodeIndex = system_touch(fs,"try2.txt");
-    writeFS(fs, inodeIndex);
+    int inode = system_touch(fs, name, fileType);
+    return inode;
+}
+int main(int argc, char const *argv[])
+{
+    int inode;
+    initFS(argv[1]);
+    WholeFS* fs = readFS(argv[1]);
+    inode = system_touch(fs, "try1.txt", FILE_MODE);
+    writeFS(fs, inode);
+    inode = system_touch(fs, "try2.txt", FILE_MODE);
+    writeFS(fs, inode);
+    inode = system_mkdir(fs, "try3", FOLDER_MODE);
     return 0;
 }

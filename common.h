@@ -22,6 +22,8 @@
 #define FREE 0
 #define OCCUPIED 1
 
+#define Malloc(n,type) (type *) malloc( (unsigned) ((n)*sizeof(type)))
+
 #define DIRECTORY_ENTRY_LENGTH 16
 // just buffer
 typedef struct DATABLOCK
@@ -77,6 +79,7 @@ typedef struct WHOLEFS
     SuperBlock sb;
     DataBlock db[NO_OF_DATA_BLOCKS];
     Inode ib[NO_OF_INODES];
+    char* fileSystemName;
 }WholeFS;
 
 #endif
