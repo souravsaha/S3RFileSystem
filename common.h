@@ -19,6 +19,7 @@
 #define FILE_MODE 0
 #define FOLDER_MODE 1
 
+#define DIRECTORY_INDICATOR "/"
 #define FREE 0
 #define OCCUPIED 1
 

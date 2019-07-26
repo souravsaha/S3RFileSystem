@@ -9,7 +9,7 @@ int getPwdInodeNumber(WholeFS* fs)
 // 
 void initFS(char *fileName)
 {
-    FILE *fp = fopen(fileSystemName, "w+");
+    FILE *fp = fopen(fileName, "w+");
     int code = FILE_SYSTEM_NOT_INITIALIZED;
 
     fprintf(fp,"%d",code);
@@ -349,6 +349,26 @@ void writeFS(WholeFS *fs, int inodeIndex)
     int rootInodeIndex =  getPwdInodeNumber(fs);
     int offset = fs->ib[rootInodeIndex].fileSize % DATA_BLOCK_SIZE;
     int i;
+
+    // write super block
+    fseek(fp, sizeof(int), SEEK_SET);
+    fprintf(fp, "%d ", fs->sb.inodeCount);
+    fprintf(fp, "%d ", fs->sb.freeInodeCount);
+    fprintf(fp, "%d ", fs->sb.iNodeOffset);
+    fprintf(fp, "%d ", fs->sb.dataBlockOffset);
+    fprintf(fp, "%d ", fs->sb.dataBlockCount);
+    fprintf(fp, "%d ", fs->sb.freeDataBlockCount);
+
+    for(i = 0; i < NO_OF_INODES; i++)
+        fprintf(fp, "%d ", fs->sb.inodeList[i]);
+    
+    for(i = 0; i < NO_OF_DATA_BLOCKS; i++)
+        fprintf(fp, "%d ", fs->sb.dataBlockList[i]);
+    
+    fprintf(fp, "%d ", fs->sb.iNodeSize);
+    fprintf(fp, "%d ", fs->sb.dataBlockSize);
+
+    //writeSuperNodeBlockToFile(fs,char* blockBuffer);
     
     //printf("FileSize after touch : %d\n", fs->ib[rootInodeIndex].fileSize);
     // write data block in the file    
@@ -403,7 +423,10 @@ void writeFS(WholeFS *fs, int inodeIndex)
 
 int system_mkdir(WholeFS* fs,char* name, int fileType)
 {
-    int inode = system_touch(fs, name, fileType);
+    char *appendedFolderName = Malloc(strlen(name) + 2, char);
+    strcat(name, appendedFolderName); 
+    printf("Modified Folder Name %s", appendedFolderName);
+    int inode = system_touch(fs, appendedFolderName, fileType);
     return inode;
 }
 int main(int argc, char const *argv[])
