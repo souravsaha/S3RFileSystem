@@ -1,4 +1,5 @@
 #include "common.h"
+#include "file_handling_functions.h"
 
 int getPwdInodeNumber(WholeFS* fs)
 {
@@ -58,7 +59,7 @@ WholeFS* readFS(char *fileName)
         
         int sizeOfINodes = sizeof(Inode);
         
-        fs->sb.iNodeOffset = SIZE - (dataBlockNum*DATA_BLOCK_SIZE + noOfInodes*sizeOfINodes)+sizeof(int);
+        fs->sb.iNodeOffset = sizeof(SuperBlock)+sizeof(int);
         fs->sb.dataBlockOffset = fs->sb.iNodeOffset+fs->sb.inodeCount*fs->sb.iNodeSize;
 
         /* root inode need to be initialized */
@@ -203,6 +204,72 @@ void calculateDataBlockNoAndOffsetToWrite(WholeFS* fs,Inode* i,int inodeIndex, i
     
 }
 
+// given a block, searches filename in the block
+// returns the offset where the block is found 
+// else -1
+int searchFilenameInDataBlock(char* db,char* name,int len)
+{
+    char* ptr = strstr(db,name);
+    if(ptr)
+    {
+        
+    }
+    else
+        return -1;
+    
+}
+
+int system_rm(WholeFS* fs,char* name,int len)
+{
+    // get current inode number of current working directory
+    int dirInode = getPwdInodeNumber(fs);
+    // get Inode of the pwd directory
+    Inode* parentDirInode = getInode(fs,dirInode);
+    int totalBlocksOccupied = parentDirInode->fileSize/DATA_BLOCK_SIZE;
+    
+    // only 1st level link
+    assert(totalBlocksOccupied<=DIRECT_DATA_BLOCK_NUMBER);
+
+    // get the data block of the directory files 
+    int isFileDeleted = 0;
+
+    while(!isFileDeleted)
+    {
+        int i=0;
+        // iterate through the directory data blocks in search of 
+        // the line containing the filename
+        for(i=0;i<totalBlocksOccupied;i++)
+        {
+            if(i<DIRECT_DATA_BLOCK_NUMBER)
+            {
+                
+                //DataBlock* db = &(fs->db[i]);
+
+                // calculate offset of data block in file
+                int dataBlockIndex = parentDirInode->directDBIndex[i];
+                
+                char* buff = readDataBlockFromFile(fs,dataBlockIndex);
+                // read every 16 bit line from the data block and
+                // check if there is a match
+                int blockOffset = searchFilenameInDataBlock(buff,name,len);
+                if(blockOffset != -1)
+                {
+                    // write the inode no 0 at offset
+                    // inode_no filename --> 0 filename
+                    // TODO
+                    isFileDeleted = 1;
+                    break;
+                }
+            }
+        }
+    }
+    if(isFileDeleted)
+        return 1;  // modify if needed
+    else
+        return 0;
+    
+}
+
 
 int system_touch(WholeFS* fs,char* name, int fileType)
 {
@@ -218,7 +285,7 @@ int system_touch(WholeFS* fs,char* name, int fileType)
 
     /* Add an entry in parent */
     // TODO : get the parent directory inode no
-    int parent = getParentInode(fs);
+    int parent = getPwdInodeNumber(fs);
     //printf("Before touch : %d\n",fs->ib[parent].fileSize);
     // write into data block of parent
     // assuming everything is in direct block
@@ -349,5 +416,29 @@ int main(int argc, char const *argv[])
     inode = system_touch(fs, "try2.txt", FILE_MODE);
     writeFS(fs, inode);
     inode = system_mkdir(fs, "try3", FOLDER_MODE);
+    //int inodeIndex;
+    //initFS();
+    //WholeFS* fs = readFS();
+    /*
+    printf("*********************************************************\n");
+    printf("wholefs = %ld\n",sizeof(WholeFS));
+    printf("superBlock = %ld\n",sizeof(SuperBlock));
+    printf("Inode: %ld\n",fs->sb.iNodeOffset);
+    printf("Datablock: %ld\n",fs->sb.dataBlockOffset);
+    printf("*********************************************************\n");
+    
+
+    printf("*********************************************************\n");
+    printf("%d\n%d\n%d\ninode offset %d\n%d\ndata block offset %d\n%d\n",
+    SUPER_BLOCK_START_OFFSET,
+    SUPER_BLOCK_SIZE,
+    INODE_SIZE,
+    INODE_ARRAY_START_OFFSET,
+    INODE_ARRAY_SIZE,
+    DATA_BLOCK_ARRAY_START_OFFSET,
+    DATA_BLOCK_ARRAY_SIZE
+    );
+    printf("*********************************************************\n");
+    */
     return 0;
 }

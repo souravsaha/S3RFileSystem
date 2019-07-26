@@ -25,14 +25,29 @@
 #define Malloc(n,type) (type *) malloc( (unsigned) ((n)*sizeof(type)))
 
 #define DIRECTORY_ENTRY_LENGTH 16
+#define FILE_NAME "temp.txt"
+
+/* Define some specific offsets for file handling 
+#define INTEGER_SIZE 4
+
+#define SUPER_BLOCK_START_OFFSET INTEGER_SIZE
+#define SUPER_BLOCK_SIZE (8+1024+1024)*INTEGER_SIZE
+
+#define INODE_SIZE ((32+3)*INTEGER_SIZE)
+#define INODE_ARRAY_START_OFFSET (SUPER_BLOCK_START_OFFSET+SUPER_BLOCK_SIZE)
+#define INODE_ARRAY_SIZE INODE_SIZE*NO_OF_INODES
+
+#define DATA_BLOCK_ARRAY_START_OFFSET INODE_ARRAY_START_OFFSET+INODE_ARRAY_SIZE
+#define DATA_BLOCK_ARRAY_SIZE DATA_BLOCK_SIZE*NO_OF_DATA_BLOCKS
+*/
 // just buffer
-typedef struct DATABLOCK
+typedef struct DATABLOCK // size = 128
 {
     char content[DATA_BLOCK_SIZE];
 }DataBlock;
 
 
-typedef struct INODE
+typedef struct INODE // 140 (35*4)
 {
     int fileMode; // file or directory
     int linkCount; // no of open instances
@@ -54,19 +69,21 @@ typedef struct INODE
 
 }Inode;
 
-typedef struct SUPERBLOCK
+typedef struct SUPERBLOCK // size (8+1024+1024)*sizeof(int) = 8224
 {
     // int magic;
 
-    //
+    //inode
     int inodeCount;
     int freeInodeCount;
     int iNodeOffset;
+    
+    // data blocks
     int dataBlockOffset;
     int dataBlockCount;
     int freeDataBlockCount;
 
-    // lists
+    // free lists
     int inodeList[NO_OF_INODES];
     int dataBlockList[NO_OF_DATA_BLOCKS];
 
@@ -77,9 +94,10 @@ typedef struct SUPERBLOCK
 typedef struct WHOLEFS
 {
     SuperBlock sb;
-    DataBlock db[NO_OF_DATA_BLOCKS];
     Inode ib[NO_OF_INODES];
     char* fileSystemName;
+    DataBlock db[NO_OF_DATA_BLOCKS];
+    
 }WholeFS;
 
 #endif
