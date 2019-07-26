@@ -6,6 +6,7 @@ void system_ls(WholeFS* fs,int inodeIndex)
 {
     Inode* inode = strToInode(readInodeBlockFromFile(fs,inodeIndex),sizeof(Inode));
     int nDataBlock = getNumberOfDataBlockFromSize(inode->fileSize);
+    printf("nDataBlocks : %d\n", nDataBlock);
     int indexDataBlock, i = 0;
     int size;
     while(i < nDataBlock)

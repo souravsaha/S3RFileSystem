@@ -46,7 +46,6 @@ Inode* strToInode(char* buffer,int len)
 
 WholeFS* readFS(char const *fileName)
 {
-    printf("%s", fileName);
     // check if its a fresh copy
     FILE *fp = fopen(fileName, "r+");
     int code = FILE_SYSTEM_NOT_INITIALIZED;
@@ -58,13 +57,13 @@ WholeFS* readFS(char const *fileName)
     //printf("%d",tmp);
 
     WholeFS* fs = NULL;
-    fs->fileSystemName = Malloc(512, char);
-    strcpy(fs->fileSystemName, fileName);
     if(tmp==code) // fresh
     {
         fs = calloc(1,sizeof(WholeFS));
         if(fs==NULL)
             assert(0);
+        fs->fileSystemName = Malloc(512, char);
+        strcpy(fs->fileSystemName, fileName);
         
 
         // super block

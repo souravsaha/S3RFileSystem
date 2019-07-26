@@ -3,9 +3,9 @@
 #include "file_handling_functions.h"
 
 
-char* readNbytesFromOffset(int n,int offset)
+char* readNbytesFromOffset(int n,int offset, char *fileSystemName)
 {
-    FILE* fp = fopen(FILE_NAME,"r");
+    FILE* fp = fopen(fileSystemName,"r");
     fseek(fp, offset, SEEK_SET);
 
     // n+1 is given as fgets always returns null terminated string so one extra
@@ -18,9 +18,9 @@ char* readNbytesFromOffset(int n,int offset)
     
 }
 
-int writeNBytesToOffset(char* buffer,int n,int offset)
+int writeNBytesToOffset(char* buffer,int n,int offset, char *fileSystemName)
 {
-    FILE* fp = fopen(FILE_NAME,"r+");
+    FILE* fp = fopen(fileSystemName,"r+");
     fseek(fp, offset, SEEK_SET);
     //size_t fwrite ( const void * ptr, size_t size, size_t count, FILE * stream );
     int byteWritten = fwrite( (const void *) buffer, sizeof(char), n,fp );
@@ -36,7 +36,7 @@ void writeDataBlockToFile(WholeFS*fs,char* blockBuffer,  int index)
     
     int offset = sizeof(int) + fs->sb.dataBlockOffset + (index * DATA_BLOCK_SIZE);
 
-    writeNBytesToOffset(blockBuffer,DATA_BLOCK_SIZE,offset);
+    writeNBytesToOffset(blockBuffer,DATA_BLOCK_SIZE,offset, fs->fileSystemName);
     
 }
 
@@ -45,14 +45,14 @@ void writeInodeBlockToFile(WholeFS*fs,char* blockBuffer,  int index)
     
     int offset = sizeof(int) + fs->sb.iNodeOffset + (index * sizeof(Inode));
 
-    writeNBytesToOffset(blockBuffer,sizeof(Inode),offset);
+    writeNBytesToOffset(blockBuffer,sizeof(Inode),offset, fs->fileSystemName);
     
 }
 
 void writeSuperNodeBlockToFile(WholeFS*fs,char* blockBuffer)
 { 
     int offset = sizeof(int);
-    writeNBytesToOffset(blockBuffer,sizeof(SuperBlock),offset);    
+    writeNBytesToOffset(blockBuffer,sizeof(SuperBlock),offset, fs->fileSystemName);    
 }
 
 
@@ -60,7 +60,7 @@ char* readDataBlockFromFile(WholeFS*fs,  int index)
 {   
     
     int offset = sizeof(int) + fs->sb.dataBlockOffset + (index * DATA_BLOCK_SIZE);
-    char* data = readNbytesFromOffset(DATA_BLOCK_SIZE,offset);
+    char* data = readNbytesFromOffset(DATA_BLOCK_SIZE,offset, fs->fileSystemName);
     return data;
 }
 
@@ -68,7 +68,7 @@ char* readInodeBlockFromFile(WholeFS*fs,  int index)
 {   
     
     int offset = sizeof(int) + fs->sb.iNodeOffset + (index * sizeof(Inode));
-    char* data = readNbytesFromOffset(sizeof(Inode),offset);
+    char* data = readNbytesFromOffset(sizeof(Inode),offset, fs->fileSystemName);
     return data;
 }
 
@@ -76,7 +76,7 @@ char* readSuperBlockFromFile(WholeFS*fs,  int index)
 {   
     
     int offset = sizeof(int);
-    char* data = readNbytesFromOffset(sizeof(SuperBlock),offset);
+    char* data = readNbytesFromOffset(sizeof(SuperBlock),offset, fs->fileSystemName);
     return data;
 }
 

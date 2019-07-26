@@ -4,7 +4,10 @@
 
 int main(int argc, char const *argv[])
 {
-    int mounted = 0, input, inodeNumber;
+    int mounted = 0; 
+    int input; 
+    int inodeNumber;
+    int inode;
     char *pathName = (char*)malloc(500*sizeof(char));
     char *sourcePathName = (char*)malloc(500*sizeof(char));
     char *destinationPathName = (char*)malloc(500*sizeof(char));
@@ -12,10 +15,9 @@ int main(int argc, char const *argv[])
     char *fileName = (char*)malloc(100*sizeof(char));
 
     initFS(argv[1]);
-    printf("Here");
     WholeFS* fileSystem = readFS(argv[1]);
-
-    printf("\n Enter 1 to mount the filesystem\n");
+    
+    printf("\nEnter 1 to mount the filesystem\n");
     scanf("%d", &input);
 
     if (input != 1)
@@ -30,6 +32,7 @@ int main(int argc, char const *argv[])
     
     while (mounted == 1)
     {
+        printf("Enter 0 to exit from the fileSystem\n");
         printf("Enter 2 to change directory\n");
         printf("Enter 3 to implement copy\n");
         printf("Enter 4 to implement move\n");
@@ -44,12 +47,14 @@ int main(int argc, char const *argv[])
         printf("Enter 13 to implement unmount\n");
 
         scanf("%d", &input);
-        if ((input < 2) || (input > 13))
-            printf("Invalid input. Please enter again");
         
-        do{
-            scanf("%d", &input);
-        }while ((input < 2) || (input > 13));
+        if(!input)
+            break;
+        else if ((input < 2) || (input > 13))
+        {
+            printf("Invalid input. Please enter again\n");
+            continue;
+        }
         
         switch (input)
         {
@@ -111,7 +116,8 @@ int main(int argc, char const *argv[])
         case 11:
             printf("Enter the filename\n");
             scanf("%s", fileName);
-            system_touch( fileSystem, fileName);
+            int inode = system_touch( fileSystem, fileName);
+            writeFS(fileSystem, inode);
             break;
 
         case 12:
@@ -127,8 +133,8 @@ int main(int argc, char const *argv[])
         }
     }
 
-    printf("\nFilesystem has been unmounted.");
- 
+    printf("\nFilesystem has been unmounted.\n");
+    
     return 0;
 }
 
