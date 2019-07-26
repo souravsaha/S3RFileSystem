@@ -1,5 +1,7 @@
-#include "file_handling_functions.h"
 #include "common.h"
+#include "util.h"
+#include "file_handling_functions.h"
+
 
 char* readNbytesFromOffset(int n,int offset)
 {
