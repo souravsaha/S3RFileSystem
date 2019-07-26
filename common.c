@@ -1,4 +1,5 @@
 #include "common.h"
+#include "file_handling_functions.h"
 
 int getPwdInodeNumber(WholeFS* fs)
 {
@@ -57,7 +58,7 @@ WholeFS* readFS()
         
         int sizeOfINodes = sizeof(Inode);
         
-        fs->sb.iNodeOffset = SIZE - (dataBlockNum*DATA_BLOCK_SIZE + noOfInodes*sizeOfINodes)+sizeof(int);
+        fs->sb.iNodeOffset = sizeof(SuperBlock)+sizeof(int);
         fs->sb.dataBlockOffset = fs->sb.iNodeOffset+fs->sb.inodeCount*fs->sb.iNodeSize;
 
         /* root inode need to be initialized */
@@ -387,13 +388,27 @@ int main()
     int inodeIndex;
     initFS();
     WholeFS* fs = readFS();
+    /*
     printf("*********************************************************\n");
     printf("wholefs = %ld\n",sizeof(WholeFS));
     printf("superBlock = %ld\n",sizeof(SuperBlock));
-    printf("Inode: %ld\n",sizeof(Inode));
-    printf("Datablock: %ld\n",sizeof(DataBlock));
+    printf("Inode: %ld\n",fs->sb.iNodeOffset);
+    printf("Datablock: %ld\n",fs->sb.dataBlockOffset);
     printf("*********************************************************\n");
+    
 
+    printf("*********************************************************\n");
+    printf("%d\n%d\n%d\ninode offset %d\n%d\ndata block offset %d\n%d\n",
+    SUPER_BLOCK_START_OFFSET,
+    SUPER_BLOCK_SIZE,
+    INODE_SIZE,
+    INODE_ARRAY_START_OFFSET,
+    INODE_ARRAY_SIZE,
+    DATA_BLOCK_ARRAY_START_OFFSET,
+    DATA_BLOCK_ARRAY_SIZE
+    );
+    printf("*********************************************************\n");
+    */
     inodeIndex = system_touch(fs,"try1.txt");
     writeFS(fs, inodeIndex);
     inodeIndex = system_touch(fs,"try2.txt");
