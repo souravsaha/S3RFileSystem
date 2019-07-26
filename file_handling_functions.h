@@ -5,7 +5,9 @@
  */
 #include "common.h"
 
-char* readDataBlock(WholeFS*fs, FILE *fp, int index);
-
+char* readNbytesFromOffset(int n,int offset);
+int writeNBytesToOffset(char* buffer,int n,int offset);
+void writeDataBlockToFile(WholeFS*fs,char* blockBuffer,  int index);
+char* readDataBlockFromFile(WholeFS*fs,  int index);
 
 #endif

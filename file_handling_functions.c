@@ -50,7 +50,7 @@ char* writeDataBlockToFile(WholeFS*fs,  int index)
 {
     return NULL;
 }
-
+/*
 int main()
 {
     char c[16];
@@ -59,3 +59,4 @@ int main()
 
     return 0;
 }
+ */

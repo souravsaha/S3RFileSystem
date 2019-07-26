@@ -157,14 +157,6 @@ int getFirstFreeDataBlockIndex(WholeFS* fs)
     assert(0);
 }
 
-
-// uses current working directory to get parent inode index 
-// returns inode index of the parent directory
-int getParentInode(WholeFS* fs)
-{
-    return 1;
-}
-
 Inode* getInode(WholeFS* fs,int index)
 {
     return &(fs->ib[index]);
@@ -207,9 +199,16 @@ void calculateDataBlockNoAndOffsetToWrite(WholeFS* fs,Inode* i,int inodeIndex, i
 // given a block, searches filename in the block
 // returns the offset where the block is found 
 // else -1
-int searchFilenameInDataBlock(DataBlock* db,char* name,int len)
+int searchFilenameInDataBlock(char* db,char* name,int len)
 {
-    return -1;
+    char* ptr = strstr(db,name);
+    if(ptr)
+    {
+        
+    }
+    else
+        return -1;
+    
 }
 
 int system_rm(WholeFS* fs,char* name,int len)
@@ -220,6 +219,9 @@ int system_rm(WholeFS* fs,char* name,int len)
     Inode* parentDirInode = getInode(fs,dirInode);
     int totalBlocksOccupied = parentDirInode->fileSize/DATA_BLOCK_SIZE;
     
+    // only 1st level link
+    assert(totalBlocksOccupied<=DIRECT_DATA_BLOCK_NUMBER);
+
     // get the data block of the directory files 
     int isFileDeleted = 0;
 
@@ -230,18 +232,26 @@ int system_rm(WholeFS* fs,char* name,int len)
         // the line containing the filename
         for(i=0;i<totalBlocksOccupied;i++)
         {
-            DataBlock* db = &(fs->db[i]);
-
-            // read every 16 bit line from the data block and
-            // check if there is a match
-            int blockOffset = searchFilenameInDataBlock(db,name,len);
-            if(blockOffset != -1)
+            if(i<DIRECT_DATA_BLOCK_NUMBER)
             {
-                // write the inode no 0 at offset
-                // inode_no filename --> 0 filename
-                // TODO
-                isFileDeleted = 1;
-                break;
+                
+                //DataBlock* db = &(fs->db[i]);
+
+                // calculate offset of data block in file
+                int dataBlockIndex = parentDirInode->directDBIndex[i];
+                
+                char* buff = readDataBlockFromFile(fs,dataBlockIndex);
+                // read every 16 bit line from the data block and
+                // check if there is a match
+                int blockOffset = searchFilenameInDataBlock(buff,name,len);
+                if(blockOffset != -1)
+                {
+                    // write the inode no 0 at offset
+                    // inode_no filename --> 0 filename
+                    // TODO
+                    isFileDeleted = 1;
+                    break;
+                }
             }
         }
     }
@@ -267,7 +277,7 @@ int system_touch(WholeFS* fs,char* name)
 
     /* Add an entry in parent */
     // TODO : get the parent directory inode no
-    int parent = getParentInode(fs);
+    int parent = getPwdInodeNumber(fs);
     //printf("Before touch : %d\n",fs->ib[parent].fileSize);
     // write into data block of parent
     // assuming everything is in direct block
