@@ -115,10 +115,10 @@ void testPrintDirectory()
     printDirectoryContent(content,size);
 }
 
-
-/* int main(int argc, char const *argv[])
+/*
+int main(int argc, char const *argv[])
 {
-    /* char path[] = "/abc/def/ghij/xyz";
+    char path[] = "/abc/def/ghij/xyz";
     char *directoryEntry = "abc 12          xyz 14                    def 17";
     //printf("String: %s, Length : %ld\n",directoryEntry,strlen(directoryEntry));
     char *dir;

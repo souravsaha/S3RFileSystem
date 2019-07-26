@@ -1,10 +1,8 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include "util.c"
+#include <stdio.h>
+#include <stdlib.h>
 #include "file_handling_functions.h"
-#include "common.c"
 
-int main()
+int main(int argc, char const *argv[])
 {
     int mounted = 0, input, inodeNumber;
     char *pathName = (char*)malloc(500*sizeof(char));
@@ -13,15 +11,16 @@ int main()
     char *newFilename = (char*)malloc(100*sizeof(char));
     char *fileName = (char*)malloc(100*sizeof(char));
 
-    initFS();
-    WholeFS* fileSystem = readFS();
+    initFS(argv[1]);
+    printf("Here");
+    WholeFS* fileSystem = readFS(argv[1]);
 
     printf("\n Enter 1 to mount the filesystem\n");
     scanf("%d", &input);
 
     if (input != 1)
     {
-        printf("\n Filesystem not mounted.\n")
+        printf("\n Filesystem not mounted.\n");
         return 0;
     }
     else
@@ -57,7 +56,7 @@ int main()
         case 2:
             printf("Enter the pathname\n");
             scanf("%s", pathName);
-            system_cd( fs, pathName);
+            system_cd( fileSystem, pathName);
             break;
         
         case 3:
@@ -65,7 +64,7 @@ int main()
             scanf("%s", sourcePathName);
             printf("Enter the pathname to copy to\n");
             scanf("%s", destinationPathName);
-            system_cp( fs, sourcePathName, destinationPathName);
+            //system_cp( fileSystem, sourcePathName, destinationPathName);
             break;
 
         case 4:
@@ -73,57 +72,56 @@ int main()
             scanf("%s", sourcePathName);
             printf("Enter the pathname to move to\n");
             scanf("%s", destinationPathName);
-            system_mv( fs, sourcePathName, destinationPathName);
+            //system_mv( fileSystem, sourcePathName, destinationPathName);
             break;
 
         case 5:
-            inodeNumber = getPwdInodeNumber(fs);
-            system_ls( fs, inodeNumber);
+            inodeNumber = getPwdInodeNumber(fileSystem);
+            system_ls( fileSystem, inodeNumber);
             break;
 
         case 6:
             printf("Enter the pathname\n");
             scanf("%s", pathName);
-            system_put( fs, pathName);
+            //system_put( fileSystem, pathName);
             break;
 
         case 7:
             printf("Enter the pathname\n");
             scanf("%s", pathName);
-            system_get( fs, pathName);
+            //system_get( fileSystem, pathName);
             break;
 
         case 8:
             printf("Enter the pathname\n");
             scanf("%s", pathName);
-            system_rm( fs, pathName);
+            //system_rm( fileSystem, pathName);
             break;
 
         case 9:
-            system_ll(fs);
+            //system_ll(fileSystem);
             break;
 
         case 10:
             printf("Enter the filename\n");
             scanf("%s", fileName);
-            system_cat( fs, fileName);
+            //system_cat( fileSystem, fileName);
             break;
 
         case 11:
             printf("Enter the filename\n");
             scanf("%s", fileName);
-            system_touch( fs, fileName);
+            system_touch( fileSystem, fileName);
             break;
 
         case 12:
-            system_pwd(fs);
+            //system_pwd(fileSystem);
             break;
 
         case 13:
-            system_unmount(fs);
+            //system_unmount(fileSystem);
             mounted = 0;
             break;
-
         default:
             break;
         }

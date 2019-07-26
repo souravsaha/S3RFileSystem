@@ -44,8 +44,9 @@ Inode* strToInode(char* buffer,int len)
 * It also changes the starting code to mark the changes
 */
 
-WholeFS* readFS(char *fileName)
+WholeFS* readFS(char const *fileName)
 {
+    printf("%s", fileName);
     // check if its a fresh copy
     FILE *fp = fopen(fileName, "r+");
     int code = FILE_SYSTEM_NOT_INITIALIZED;
@@ -100,7 +101,7 @@ WholeFS* readFS(char *fileName)
     }
     else // read from the file to memory structure
     {
-        
+        /* TODO */
     }
     
     fclose(fp);
@@ -324,15 +325,7 @@ void writeFS(WholeFS *fs, int inodeIndex)
     fclose(fp);
 }
 
-int system_mkdir(WholeFS* fs,char* name, int fileType)
-{
-    char *appendedFolderName = Malloc(strlen(name) + 2, char);
-    strcat(name, appendedFolderName); 
-    printf("Modified Folder Name %s", appendedFolderName);
-    int inode = system_touch(fs, appendedFolderName, fileType);
-    return inode;
-}
-int main(int argc, char const *argv[])
+/*int main(int argc, char const *argv[])
 {
     int inode;
     initFS(argv[1]);
@@ -345,26 +338,5 @@ int main(int argc, char const *argv[])
     //int inodeIndex;
     //initFS();
     //WholeFS* fs = readFS();
-    /*
-    printf("*********************************************************\n");
-    printf("wholefs = %ld\n",sizeof(WholeFS));
-    printf("superBlock = %ld\n",sizeof(SuperBlock));
-    printf("Inode: %ld\n",fs->sb.iNodeOffset);
-    printf("Datablock: %ld\n",fs->sb.dataBlockOffset);
-    printf("*********************************************************\n");
-    
-
-    printf("*********************************************************\n");
-    printf("%d\n%d\n%d\ninode offset %d\n%d\ndata block offset %d\n%d\n",
-    SUPER_BLOCK_START_OFFSET,
-    SUPER_BLOCK_SIZE,
-    INODE_SIZE,
-    INODE_ARRAY_START_OFFSET,
-    INODE_ARRAY_SIZE,
-    DATA_BLOCK_ARRAY_START_OFFSET,
-    DATA_BLOCK_ARRAY_SIZE
-    );
-    printf("*********************************************************\n");
-    */
     return 0;
-}
+}*/

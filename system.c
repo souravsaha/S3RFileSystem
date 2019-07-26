@@ -16,7 +16,7 @@ void system_ls(WholeFS* fs,int inodeIndex)
     }
 } 
 
-void system_cd(WholeFS* fs, char* path)
+int system_cd(WholeFS* fs, char* path)
 {
     char *dir;
     int i = 0;
@@ -30,14 +30,15 @@ void system_cd(WholeFS* fs, char* path)
             if(inodeIndex == 0)
             {
                 perror("path not found\n");
-                return;
+                return -1;
             }            
             dir = strtok(NULL,"/:");            
         }
 
         fs->pwdInodeNumber = inodeIndex;
-        return 0;
+        //return 0;
     }
+    return 0;
 }
 
 
@@ -158,4 +159,13 @@ int system_touch(WholeFS* fs,char* name, int fileType)
     }
     //printf("Direct DB Index, inode index : %d, value = %d\n", inodeIndex, fs->ib[inodeIndex].directDBIndex[0]);
     return inodeIndex;
+}
+
+int system_mkdir(WholeFS* fs,char* name, int fileType)
+{
+    char *appendedFolderName = Malloc(strlen(name) + 2, char);
+    strcat(name, appendedFolderName); 
+    printf("Modified Folder Name %s", appendedFolderName);
+    int inode = system_touch(fs, appendedFolderName, fileType);
+    return inode;
 }
