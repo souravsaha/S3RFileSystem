@@ -25,7 +25,7 @@
 #define Malloc(n,type) (type *) malloc( (unsigned) ((n)*sizeof(type)))
 
 #define DIRECTORY_ENTRY_LENGTH 16
-#define FILE_NAME "temp.txt"
+#define FILE_NAME "S3R.fs"
 
 /* Define some specific offsets for file handling 
 #define INTEGER_SIZE 4
