@@ -38,6 +38,22 @@ void writeDataBlockToFile(WholeFS*fs,char* blockBuffer,  int index)
     
 }
 
+void writeInodeBlockToFile(WholeFS*fs,char* blockBuffer,  int index)
+{   
+    
+    int offset = sizeof(int) + fs->sb.iNodeOffset + (index * sizeof(Inode));
+
+    writeNBytesToOffset(blockBuffer,sizeof(Inode),offset);
+    
+}
+
+void writeSuperNodeBlockToFile(WholeFS*fs,char* blockBuffer)
+{ 
+    int offset = sizeof(int);
+    writeNBytesToOffset(blockBuffer,sizeof(SuperBlock),offset);    
+}
+
+
 char* readDataBlockFromFile(WholeFS*fs,  int index)
 {   
     
@@ -46,17 +62,19 @@ char* readDataBlockFromFile(WholeFS*fs,  int index)
     return data;
 }
 
-char* writeDataBlockToFile(WholeFS*fs,  int index)
-{
-    return NULL;
+char* readInodeBlockFromFile(WholeFS*fs,  int index)
+{   
+    
+    int offset = sizeof(int) + fs->sb.iNodeOffset + (index * sizeof(Inode));
+    char* data = readNbytesFromOffset(sizeof(Inode),offset);
+    return data;
 }
-/*
-int main()
-{
-    char c[16];
-    strcpy(c,"12345667");
-    writeNBytesToOffset(c,3,120);
 
-    return 0;
+char* readSuperBlockFromFile(WholeFS*fs,  int index)
+{   
+    
+    int offset = sizeof(int);
+    char* data = readNbytesFromOffset(sizeof(SuperBlock),offset);
+    return data;
 }
- */
+
