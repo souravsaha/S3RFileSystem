@@ -9,7 +9,7 @@ int getPwdInodeNumber(WholeFS* fs)
 // 
 void initFS(char *fileName)
 {
-    FILE *fp = fopen(fileSystemName, "w+");
+    FILE *fp = fopen(FILE_NAME, "w+");
     int code = FILE_SYSTEM_NOT_INITIALIZED;
 
     fprintf(fp,"%d",code);
@@ -18,6 +18,25 @@ void initFS(char *fileName)
     fclose(fp);
 
 }
+
+Inode* strToInode(char* buffer,int len)
+{
+    Inode* newNode = (Inode*)malloc(sizeof(Inode));
+    assert(newNode!=NULL);
+
+    sscanf(buffer,"%d ",&(newNode->fileMode));
+    sscanf(buffer,"%d ",&(newNode->linkCount));
+    sscanf(buffer,"%d ",&(newNode->fileSize));
+    
+    int i;
+    for ( i = 0; i < DIRECT_DATA_BLOCK_NUMBER; i++)
+    {
+        sscanf(buffer,"%d ",&(newNode->directDBIndex[i]));
+    }
+
+    return newNode;
+}
+
 /*
 * ReadFs returns the existing structure into memory.
 * If Doesnt exist creates from scratch
