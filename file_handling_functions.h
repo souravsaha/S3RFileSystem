@@ -7,7 +7,7 @@
 
 //char* readNbytesFromOffset(int n,int offset);
 //int writeNBytesToOffset(char* buffer,int n,int offset);
-    void writeDataBlockToFile(WholeFS*fs,char* blockBuffer,  int index);
+    int writeDataBlockToFile(WholeFS*fs,char* blockBuffer,int existingfileSize,  int index);
     char* readDataBlockFromFile(WholeFS*fs,  int index);
     void writeInodeBlockToFile(WholeFS*fs,char* blockBuffer,  int index);
     char* readInodeBlockFromFile(WholeFS*fs,  int index);
