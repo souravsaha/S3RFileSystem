@@ -17,7 +17,7 @@ int main(int argc, char const *argv[])
     int isInitialized = 0;
     initFS(argv[1]);
     WholeFS* fileSystem = readFS(argv[1],&isInitialized);
-    
+
     if(!isInitialized)
         writeSuperBlock(fileSystem);
     
@@ -131,6 +131,8 @@ int main(int argc, char const *argv[])
         case 13:
             //system_unmount(fileSystem);
             mounted = 0;
+            writeSuperBlock(fileSystem);
+
             break;
         default:
             break;

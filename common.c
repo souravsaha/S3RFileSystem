@@ -11,6 +11,7 @@ int getPwdInodeNumber(WholeFS* fs)
 
 void initFS(char *fileName)
 {
+
     if( access( fileName, F_OK ) != -1 ) {
     // file exists
         return;
@@ -319,68 +320,7 @@ void writeFS(WholeFS *fs, int inodeIndex)
     fclose(fp);
 }
 
-void writeSuperBlock(WholeFS *fs)
-{
-    FILE *fp = fopen(fs->fileSystemName, "r+");
-    int i;
-    // write super block
-    fseek(fp, sizeof(int), SEEK_SET);
-    fprintf(fp, "%d ", fs->sb.inodeCount);
-    fprintf(fp, "%d ", fs->sb.freeInodeCount);
-    fprintf(fp, "%d ", fs->sb.iNodeOffset);
-    fprintf(fp, "%d ", fs->sb.dataBlockOffset);
-    fprintf(fp, "%d ", fs->sb.dataBlockCount);
-    fprintf(fp, "%d ", fs->sb.freeDataBlockCount);
-    fprintf(fp, "%d ", fs->sb.iNodeSize);
-    fprintf(fp, "%d ", fs->sb.dataBlockSize);
 
-    for(i = 0; i < NO_OF_INODES; i++)
-        fprintf(fp, "%d ", fs->sb.inodeList[i]);
-    
-    for(i = 0; i < NO_OF_DATA_BLOCKS; i++)
-        fprintf(fp, "%d ", fs->sb.dataBlockList[i]);
-    
-    
-
-    fclose(fp);
-}
-
-// reads super block into memory
-void readSuperBlock(WholeFS* fs)
-{
-    FILE *fp = fopen(fs->fileSystemName, "r");
-    int i;
-    // write super block
-    fseek(fp, sizeof(int), SEEK_SET);
-    fscanf(fp, "%d ", &(fs->sb.inodeCount));
-    fscanf(fp, "%d ", &(fs->sb.freeInodeCount));
-    fscanf(fp, "%d ", &(fs->sb.iNodeOffset));
-    fscanf(fp, "%d ", &(fs->sb.dataBlockOffset));
-    fscanf(fp, "%d ", &(fs->sb.dataBlockCount));
-    fscanf(fp, "%d ", &(fs->sb.freeDataBlockCount));
-
-    for(i = 0; i < NO_OF_INODES; i++)
-        fscanf(fp, "%d ", &(fs->sb.inodeList[i]));
-    
-    for(i = 0; i < NO_OF_DATA_BLOCKS; i++)
-        fprintf(fp, "%d ", &(fs->sb.dataBlockList[i]));
-    
-    fprintf(fp, "%d ", &(fs->sb.iNodeSize));
-    fprintf(fp, "%d ", &(fs->sb.dataBlockSize));
-
-    /*print */
-    printf("inodecount: %d \n", (fs->sb.inodeCount));
-    printf("freeInode: %d \n", (fs->sb.freeInodeCount));
-    printf("inodeOfsset: %d \n", (fs->sb.iNodeOffset));
-    printf("datablockoffset %d \n", (fs->sb.dataBlockOffset));
-    printf("datablockCount %d \n", (fs->sb.dataBlockCount));
-    printf("freeDataBlockCount %d\n", (fs->sb.freeDataBlockCount));
-    printf("inodesize: %d ", (fs->sb.iNodeSize));
-    printf("datablocksize: %d ", (fs->sb.dataBlockSize));
-    
-
-    fclose(fp);
-}
 
 /*int main(int argc, char const *argv[])
 {
