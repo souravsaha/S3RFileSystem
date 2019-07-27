@@ -24,7 +24,7 @@ void writeSuperBlock(WholeFS *fs)
     FILE *fp = fopen(fs->fileSystemName, "r+");
     int i;
     // write super block
-    fseek(fp, sizeof(int), SEEK_SET);
+    fseek(fp, sizeof(int)+1, SEEK_SET);
     fprintf(fp, "%d ", fs->sb.inodeCount);
     fprintf(fp, "%d ", fs->sb.freeInodeCount);
     fprintf(fp, "%d ", fs->sb.iNodeOffset);

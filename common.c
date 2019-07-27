@@ -120,7 +120,7 @@ WholeFS* readFS(char const *fileName,int* isInitialized)
     }
     else // read from the file to memory structure
     {
-        printf("superblock print");
+        printf("****superblock print");
         readSuperBlock(fs);
         
     }
