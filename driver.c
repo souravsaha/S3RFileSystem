@@ -16,6 +16,7 @@ int main(int argc, char const *argv[])
 
     initFS(argv[1]);
     WholeFS* fileSystem = readFS(argv[1]);
+    writeSuperBlock(fileSystem);
     
     printf("\nEnter 1 to mount the filesystem\n");
     scanf("%d", &input);

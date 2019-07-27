@@ -253,25 +253,7 @@ void writeFS(WholeFS *fs, int inodeIndex)
     int rootInodeIndex =  getPwdInodeNumber(fs);
     int offset = fs->ib[rootInodeIndex].fileSize % DATA_BLOCK_SIZE;
     int i;
-
-    // write super block
-    fseek(fp, sizeof(int), SEEK_SET);
-    fprintf(fp, "%d ", fs->sb.inodeCount);
-    fprintf(fp, "%d ", fs->sb.freeInodeCount);
-    fprintf(fp, "%d ", fs->sb.iNodeOffset);
-    fprintf(fp, "%d ", fs->sb.dataBlockOffset);
-    fprintf(fp, "%d ", fs->sb.dataBlockCount);
-    fprintf(fp, "%d ", fs->sb.freeDataBlockCount);
-
-    for(i = 0; i < NO_OF_INODES; i++)
-        fprintf(fp, "%d ", fs->sb.inodeList[i]);
     
-    for(i = 0; i < NO_OF_DATA_BLOCKS; i++)
-        fprintf(fp, "%d ", fs->sb.dataBlockList[i]);
-    
-    fprintf(fp, "%d ", fs->sb.iNodeSize);
-    fprintf(fp, "%d ", fs->sb.dataBlockSize);
-
     //writeSuperNodeBlockToFile(fs,char* blockBuffer);
     
     //printf("FileSize after touch : %d\n", fs->ib[rootInodeIndex].fileSize);
@@ -317,6 +299,30 @@ void writeFS(WholeFS *fs, int inodeIndex)
     fclose(fp);
 }
 
+void writeSuperBlock(WholeFS *fs)
+{
+    FILE *fp = fopen(fs->fileSystemName, "r+");
+    int i;
+    // write super block
+    fseek(fp, sizeof(int), SEEK_SET);
+    fprintf(fp, "%d ", fs->sb.inodeCount);
+    fprintf(fp, "%d ", fs->sb.freeInodeCount);
+    fprintf(fp, "%d ", fs->sb.iNodeOffset);
+    fprintf(fp, "%d ", fs->sb.dataBlockOffset);
+    fprintf(fp, "%d ", fs->sb.dataBlockCount);
+    fprintf(fp, "%d ", fs->sb.freeDataBlockCount);
+
+    for(i = 0; i < NO_OF_INODES; i++)
+        fprintf(fp, "%d ", fs->sb.inodeList[i]);
+    
+    for(i = 0; i < NO_OF_DATA_BLOCKS; i++)
+        fprintf(fp, "%d ", fs->sb.dataBlockList[i]);
+    
+    fprintf(fp, "%d ", fs->sb.iNodeSize);
+    fprintf(fp, "%d ", fs->sb.dataBlockSize);
+
+    fclose(fp);
+}
 /*int main(int argc, char const *argv[])
 {
     int inode;
