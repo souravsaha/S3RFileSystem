@@ -6,12 +6,13 @@
 #include <fcntl.h>
 #include <assert.h>
 #include <string.h>
+#include <unistd.h>
 
 #define SIZE 1024*1024
 #define DATA_BLOCK_SIZE 128
 #define DIRECT_DATA_BLOCK_NUMBER 32
-#define FILE_SYSTEM_ALREADY_INITIALIZED 67895
-#define FILE_SYSTEM_NOT_INITIALIZED 89702
+#define FILE_SYSTEM_ALREADY_INITIALIZED 1111
+#define FILE_SYSTEM_NOT_INITIALIZED 2222
 
 #define NO_OF_INODES 1024
 #define NO_OF_DATA_BLOCKS 1024
@@ -106,7 +107,7 @@ typedef struct WHOLEFS
 Inode* strToInode(char* buffer,int len);
 int getPwdInodeNumber(WholeFS* fs);
 Inode* strToInode(char* buffer,int len);
-WholeFS* readFS(char const *fileName);
+WholeFS* readFS(char const *fileName, int* i);
 void writeInode(WholeFS* fs,int index,int mode);
 void writeDataBlock(WholeFS* fs,int index,int offset,char* content,int len);
 DataBlock* readDataBlock(WholeFS* fs,int index);
@@ -120,5 +121,5 @@ void calculateDataBlockNoAndOffsetToWrite(WholeFS* fs,Inode* i,int inodeIndex, i
 int searchFilenameInDataBlock(char* db,char* name,int len);
 int getDBlockNumberFromSize(int size);
 void writeFS(WholeFS *fs, int inodeIndex);
-
+void readSuperBlock(WholeFS* fs);
 #endif

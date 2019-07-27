@@ -14,9 +14,12 @@ int main(int argc, char const *argv[])
     char *newFilename = (char*)malloc(100*sizeof(char));
     char *fileName = (char*)malloc(100*sizeof(char));
 
+    int isInitialized = 0;
     initFS(argv[1]);
-    WholeFS* fileSystem = readFS(argv[1]);
-    writeSuperBlock(fileSystem);
+    WholeFS* fileSystem = readFS(argv[1],&isInitialized);
+    
+    if(!isInitialized)
+        writeSuperBlock(fileSystem);
     
     printf("\nEnter 1 to mount the filesystem\n");
     scanf("%d", &input);
