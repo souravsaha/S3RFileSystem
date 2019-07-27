@@ -79,7 +79,7 @@ char* readInodeBlockFromFile(WholeFS*fs,  int index)
     return data;
 }
 
-char* readSuperBlockFromFile(WholeFS*fs,  int index)
+char* readSuperBlockFromFile(WholeFS*fs)
 {
 
     int offset = sizeof(int);

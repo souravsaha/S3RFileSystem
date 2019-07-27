@@ -26,10 +26,11 @@
 #define Malloc(n,type) (type *) malloc( (unsigned) ((n)*sizeof(type)))
 
 #define DIRECTORY_ENTRY_LENGTH 16
+
 #define FILE_NAME "S3R.fs"
 
 /* Define some specific offsets for file handling 
-#define INTEGER_SIZE 4
+
 
 #define SUPER_BLOCK_START_OFFSET INTEGER_SIZE
 #define SUPER_BLOCK_SIZE (8+1024+1024)*INTEGER_SIZE

@@ -58,15 +58,20 @@ WholeFS* readFS(char const *fileName)
     //printf("%d",tmp);
 
     WholeFS* fs = NULL;
+
+    // setting name as it must be done before all
+    fs = calloc(1,sizeof(WholeFS));
+    if(fs==NULL)
+        assert(0);
+    fs->fileSystemName = Malloc(512, char);
+    strcpy(fs->fileSystemName, fileName);
+
+
+    
+
+        
     if(tmp==code) // fresh
     {
-        fs = calloc(1,sizeof(WholeFS));
-        if(fs==NULL)
-            assert(0);
-        fs->fileSystemName = Malloc(512, char);
-        strcpy(fs->fileSystemName, fileName);
-
-
         // super block
         int noOfInodes = NO_OF_INODES; // 8% of total space allocated to inode
         fs->sb.inodeCount = noOfInodes;
@@ -82,6 +87,7 @@ WholeFS* readFS(char const *fileName)
 
         fs->sb.iNodeOffset = sizeof(SuperBlock)+sizeof(int);
         fs->sb.dataBlockOffset = fs->sb.iNodeOffset+fs->sb.inodeCount*fs->sb.iNodeSize;
+
 
         /* root inode need to be initialized */
         int pwdInodeNumber = getPwdInodeNumber(fs);
@@ -101,7 +107,8 @@ WholeFS* readFS(char const *fileName)
     }
     else // read from the file to memory structure
     {
-        /* TODO */
+        readSuperBlock(fs);
+       
     }
 
     fclose(fp);
@@ -323,6 +330,33 @@ void writeSuperBlock(WholeFS *fs)
 
     fclose(fp);
 }
+
+// reads super block into memory
+void readSuperBlock(WholeFS* fs)
+{
+    FILE *fp = fopen(fs->fileSystemName, "r");
+    int i;
+    // write super block
+    fseek(fp, sizeof(int), SEEK_SET);
+    fscanf(fp, "%d ", &(fs->sb.inodeCount));
+    fscanf(fp, "%d ", &(fs->sb.freeInodeCount));
+    fscanf(fp, "%d ", &(fs->sb.iNodeOffset));
+    fscanf(fp, "%d ", &(fs->sb.dataBlockOffset));
+    fscanf(fp, "%d ", &(fs->sb.dataBlockCount));
+    fscanf(fp, "%d ", &(fs->sb.freeDataBlockCount));
+
+    for(i = 0; i < NO_OF_INODES; i++)
+        fscanf(fp, "%d ", &(fs->sb.inodeList[i]));
+    
+    for(i = 0; i < NO_OF_DATA_BLOCKS; i++)
+        fprintf(fp, "%d ", &(fs->sb.dataBlockList[i]));
+    
+    fprintf(fp, "%d ", &(fs->sb.iNodeSize));
+    fprintf(fp, "%d ", &(fs->sb.dataBlockSize));
+
+    fclose(fp);
+}
+
 /*int main(int argc, char const *argv[])
 {
     int inode;

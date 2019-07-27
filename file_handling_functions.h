@@ -11,7 +11,7 @@
     char* readDataBlockFromFile(WholeFS*fs,  int index);
     void writeInodeBlockToFile(WholeFS*fs,char* blockBuffer,  int index);
     char* readInodeBlockFromFile(WholeFS*fs,  int index);
-    char* readSuperBlockFromFile(WholeFS*fs,  int index);
+    char* readSuperBlockFromFile(WholeFS*fs);
     void writeSuperNodeBlockToFile(WholeFS*fs,char* blockBuffer);
 
 #endif
