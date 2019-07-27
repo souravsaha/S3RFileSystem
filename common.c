@@ -22,6 +22,7 @@ void initFS(char *fileName)
 
 Inode* strToInode(char* buffer,int len)
 {
+    printf("");
     Inode* newNode = (Inode*)malloc(sizeof(Inode));
     assert(newNode!=NULL);
 
@@ -236,14 +237,14 @@ int searchFilenameInDataBlock(char* db,char* name,int len)
     }
     else
         return -1;
-    
+    return -1; // dummy
 }
 
 
 /* TODO complete the function */
 int getDBlockNumberFromSize(int size)
 {
-    return 0;
+    return 1;
 }
 
 void writeFS(WholeFS *fs, int inodeIndex)
@@ -275,52 +276,44 @@ void writeFS(WholeFS *fs, int inodeIndex)
     
     //printf("FileSize after touch : %d\n", fs->ib[rootInodeIndex].fileSize);
     // write data block in the file    
-    fseek(fp, sizeof(int), SEEK_SET);
-    fseek(fp, fs->sb.dataBlockOffset, SEEK_CUR);
+    fseek(fp, fs->sb.dataBlockOffset, SEEK_SET);
+    /* TODO complete getDBlockNumberFromSize*/
     fseek(fp, getDBlockNumberFromSize(fs->ib[rootInodeIndex].fileSize) * DATA_BLOCK_SIZE, SEEK_CUR);
     fseek(fp, offset , SEEK_CUR);
     
     //printf("Data Block Offset : %d \n",fs->sb.dataBlockOffset);
     
-    printf("offset value : %d\n", offset);
+    printf("offset value : %d \n", offset);
+    printf("data block offset : %d \n", fs->sb.dataBlockOffset);
+
     
     DataBlock* db = &(fs->db[rootInodeIndex]);
+    
+    char* temp = db->content + offset; 
+    fprintf(fp, "%s", temp);
+    /*
     for( i = 0 ; i < DIRECTORY_ENTRY_LENGTH ; i++)
     {
         printf("%c", db->content[i + offset]);
         fputc(db->content[i + offset], fp);
-    }
-
+    }*/
     fs->ib[rootInodeIndex].fileSize += DIRECTORY_ENTRY_LENGTH;
 
     // write inode in the file
-    fseek(fp, sizeof(int), SEEK_SET);
 
-    fseek(fp, fs->sb.iNodeOffset, SEEK_CUR);
+    fseek(fp, fs->sb.iNodeOffset, SEEK_SET);
     fseek(fp, rootInodeIndex * fs->sb.iNodeSize, SEEK_CUR);
     
     fprintf(fp, "%d ", fs->ib[rootInodeIndex].fileMode);
-    printf("%d ", fs->ib[rootInodeIndex].fileMode);
+    //printf("%d ", fs->ib[rootInodeIndex].fileMode);
     fprintf(fp, "%d ", fs->ib[rootInodeIndex].linkCount);
-    printf("%d ", fs->ib[rootInodeIndex].linkCount);
+    //printf("%d ", fs->ib[rootInodeIndex].linkCount);
     fprintf(fp, "%d ", fs->ib[rootInodeIndex].fileSize);
-    printf("%d ", fs->ib[rootInodeIndex].fileSize);
+    //printf("%d ", fs->ib[rootInodeIndex].fileSize);
     
     for(i = 0; i < DIRECT_DATA_BLOCK_NUMBER; i++)
         fprintf(fp, "%d ", fs->ib[rootInodeIndex].directDBIndex[i]);
     
-
-    fseek(fp, sizeof(int), SEEK_SET);
-
-    fseek(fp, fs->sb.iNodeOffset, SEEK_CUR);
-    fseek(fp, inodeIndex * fs->sb.iNodeSize, SEEK_CUR);
- 
-    fprintf(fp, "%d ", fs->ib[inodeIndex].fileMode);
-    fprintf(fp, "%d ", fs->ib[inodeIndex].linkCount);
-    fprintf(fp, "%d ", fs->ib[inodeIndex].fileSize);
-
-    for(i = 0; i<DIRECT_DATA_BLOCK_NUMBER; i++)
-        fprintf(fp, "%d ", fs->ib[inodeIndex].directDBIndex[i]);
     fclose(fp);
 }
 

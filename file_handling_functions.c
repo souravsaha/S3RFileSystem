@@ -19,7 +19,7 @@ char* readNbytesFromOffset(int n,int offset, char *fileSystemName)
 
 }
 
-int writeNBytesToOffset(char* buffer,int n,int offset, char *fileSystemName)
+void writeNBytesToOffset(char* buffer,int n,int offset, char *fileSystemName)
 {
     FILE* fp = fopen(fileSystemName,"r+");
     fseek(fp, offset, SEEK_SET);

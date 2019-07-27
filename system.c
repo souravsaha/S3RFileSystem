@@ -13,6 +13,7 @@ void system_ls(WholeFS* fs,int inodeIndex)
     printf("inode->fileSize: %d\n",inode->fileSize);
 
 
+
     int nDataBlock = getNumberOfDataBlockFromSize(inode->fileSize);
     printf("nDataBlocks : %d\n", nDataBlock);
     printf("-------------------\n");
@@ -147,7 +148,8 @@ int system_touch(WholeFS* fs,char* name, int fileType)
     printf("\nblockNo = %d offset= %d\n",blockNo,blockOffset);
 
     char buffer[16];
-    sprintf(buffer,"%d %s\n",blockNo,name);
+    sprintf(buffer,"%d %s",blockNo,name);
+    printf("Buffer content %s\n", buffer);
     int pwdInodeNumber = getPwdInodeNumber(fs);
 
     // still can append in the last block
