@@ -40,6 +40,8 @@ void initFS(char *fileName)
 Inode* strToInode(char* buffer,int len)
 {
     
+    printf("In strToInode\n");
+    printf("buff : %s\n",buffer);
     Inode* newNode = (Inode*)malloc(sizeof(Inode));
     assert(newNode!=NULL);
 
@@ -47,11 +49,13 @@ Inode* strToInode(char* buffer,int len)
     sscanf(buffer,"%d ",&(newNode->linkCount));
     sscanf(buffer,"%d ",&(newNode->fileSize));
 
-    int i;
+    int i,DBIndex;
     for ( i = 0; i < DIRECT_DATA_BLOCK_NUMBER; i++)
     {
-        sscanf(buffer,"%d ",&(newNode->directDBIndex[i]));
+        sscanf(buffer,"%d ",&(DBIndex));
+        newNode->directDBIndex[i] = DBIndex;
     }
+    printf("newNode fileMode : %d,linkCount : %d,DB[0]: %d\n",newNode->fileMode,newNode->linkCount,newNode->directDBIndex[0]);
 
     return newNode;
 }
@@ -368,6 +372,8 @@ void writeFS(WholeFS *fs, int inodeIndex)
     fprintf(fp, "%d ", fs->ib[inodeIndex].linkCount);
     fprintf(fp, "%d ", fs->ib[inodeIndex].fileSize);
 
+
+    printf("Inode WriteFS : %d, DB[0]: %d\n",inodeIndex,fs->ib[inodeIndex].directDBIndex[0]);
     for(i = 0; i<DIRECT_DATA_BLOCK_NUMBER; i++)
         fprintf(fp, "%d ", fs->ib[inodeIndex].directDBIndex[i]);
    

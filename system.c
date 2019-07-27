@@ -15,18 +15,18 @@ void system_ls(WholeFS* fs,int inodeIndex)
 
 
     int nDataBlock = getNumberOfDataBlockFromSize(inode->fileSize);
-    /* printf("nDataBlocks : %d\n", nDataBlock);
-    printf("-------------------\n"); */
+    printf("nDataBlocks : %d\n", nDataBlock);
+    printf("-------------------\n");
 
     int indexDataBlock, i = 0;
-    //printf("i : %d, nDataBlock : %d\n",i,nDataBlock);
+    printf("i : %d, nDataBlock : %d\n",i,nDataBlock);
     while(i < nDataBlock)
     {
-       //printf("in while loop\n");
+       printf("in while loop\n");
        indexDataBlock =  getDataBlockIndex(fs,inodeIndex,i++);
-       //printf("indexDataBlock : %d\n",indexDataBlock);
+       printf("indexDataBlock : %d\n",indexDataBlock);
        char *data = readDataBlockFromFile(fs,indexDataBlock);
-       //printf("data : %s\n",data);
+       printf("data : %s\n",data);
        //printf("data :%s\n",readDataBlockFromFile(fs,indexDataBlock));
        printDirectoryContent(data,DATA_BLOCK_SIZE);
     }
@@ -116,6 +116,8 @@ int system_touch(WholeFS* fs,char* name, int fileType)
     /*Make the file */
     int inodeIndex = getFirstFreeInodeIndex(fs); // get free inode
     int dataBlockidx = getFirstFreeDataBlockIndex(fs); //get first free data block
+    fs->sb.dataBlockList[dataBlockidx] = OCCUPIED;
+    fs->sb.freeDataBlockCount--;
     printf("Free Inode no :%d\n",inodeIndex);
 
     fs->sb.inodeList[inodeIndex] = OCCUPIED;

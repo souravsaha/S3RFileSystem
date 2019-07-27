@@ -121,7 +121,7 @@ int main(int argc, char const *argv[])
         case 11:
             printf("Enter the filename\n");
             scanf("%s", fileName);
-            int inode = system_touch( fileSystem, fileName);            
+            int inode = system_touch( fileSystem, fileName, FILE_MODE);            
             break;
 
         case 12:

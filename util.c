@@ -58,10 +58,18 @@ void printDirectoryContent(char *data,int size)
 
 int getDataBlockIndex(WholeFS* fs, int inodeIndex, int nDataBlock)
 {
+    printf("In getDataBlockIndex\n");
     int nEntryInSingleIndirect = DATA_BLOCK_SIZE/sizeof(int);
     int nDirectDataBlock = DIRECT_DATA_BLOCK_NUMBER - 3;
+    
+    char *buffer = readInodeBlockFromFile(fs,inodeIndex);
+    Inode *inode = strToInode(buffer,sizeof(Inode));
+    printf("Inode index : %d, DB[0] : %d\n",inodeIndex,inode->directDBIndex[0]);
+
+
     if(nDataBlock < nDirectDataBlock)
-        return fs->ib[inodeIndex].directDBIndex[nDataBlock];
+        return inode->directDBIndex[nDataBlock];
+    
     else if((nDataBlock >= nDirectDataBlock) && (nDataBlock < nDirectDataBlock + nEntryInSingleIndirect))
         return readSingleRedirectDataBlock(fs->ib[inodeIndex].directDBIndex[nDirectDataBlock],nDataBlock - nDirectDataBlock);
 }

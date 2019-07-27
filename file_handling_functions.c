@@ -58,6 +58,8 @@ void readSuperBlock(WholeFS* fs)
     fscanf(fp, "%d ", &(fs->sb.dataBlockOffset));
     fscanf(fp, "%d ", &(fs->sb.dataBlockCount));
     fscanf(fp, "%d ", &(fs->sb.freeDataBlockCount));
+    fscanf(fp, "%d ", &(fs->sb.iNodeSize));
+    fscanf(fp, "%d ", &(fs->sb.dataBlockSize));
 
     for(i = 0; i < NO_OF_INODES; i++)
         fscanf(fp, "%d ", &(fs->sb.inodeList[i]));
@@ -65,8 +67,7 @@ void readSuperBlock(WholeFS* fs)
     for(i = 0; i < NO_OF_DATA_BLOCKS; i++)
         fprintf(fp, "%d ", &(fs->sb.dataBlockList[i]));
     
-    fscanf(fp, "%d ", &(fs->sb.iNodeSize));
-    fscanf(fp, "%d ", &(fs->sb.dataBlockSize));
+    
 
     /*print */
     printf("inodecount: %d \n", (fs->sb.inodeCount));
@@ -78,6 +79,7 @@ void readSuperBlock(WholeFS* fs)
     printf("inodesize: %d ", (fs->sb.iNodeSize));
     printf("datablocksize: %d ", (fs->sb.dataBlockSize));
     
+    fs->pwdInodeNumber = 1;
 
     fclose(fp);
 }
