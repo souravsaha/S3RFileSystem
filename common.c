@@ -8,17 +8,33 @@ int getPwdInodeNumber(WholeFS* fs)
     return fs->pwdInodeNumber;
 }
 // TODO take filesize as argument
-//
+
+
 void initFS(char *fileName)
 {
-    FILE *fp = fopen(fileName, "w+");
-    int code = FILE_SYSTEM_NOT_INITIALIZED;
 
-    fprintf(fp,"%d",code);
-    fseek(fp, sizeof(code)+SIZE-1 , SEEK_SET);
+    if( access( fileName, F_OK ) != -1 ) {
+    // file exists
+        return;
+    } 
+    else {
+    // file doesn't exist
+    
+    FILE *fp = fopen(fileName, "w+");
+    int  temp = 0;
+    
+    fscanf(fp,"%d ",&temp);
+    printf("temp %d \n", temp);
+    /*
+    if(temp==FILE_SYSTEM_ALREADY_INITIALIZED)
+        return;   
+    fclose(fp);
+     */
+    fprintf(fp,"%d ",FILE_SYSTEM_NOT_INITIALIZED);
+    fseek(fp, sizeof(int)+SIZE-1 , SEEK_SET);
     fputc('\0', fp);
     fclose(fp);
-
+    }
 }
 
 Inode* strToInode(char* buffer,int len)
@@ -46,7 +62,7 @@ Inode* strToInode(char* buffer,int len)
 * It also changes the starting code to mark the changes
 */
 
-WholeFS* readFS(char const *fileName)
+WholeFS* readFS(char const *fileName,int* isInitialized)
 {
     // check if its a fresh copy
     FILE *fp = fopen(fileName, "r+");
@@ -55,19 +71,21 @@ WholeFS* readFS(char const *fileName)
 
     //read the starting char
     //fseek(fp,0,SEEK_SET);
-    fscanf(fp,"%d",&tmp);
+    fscanf(fp,"%d ",&tmp);
     //printf("%d",tmp);
 
     WholeFS* fs = NULL;
+
+    // setting name as it must be done before all
+    fs = calloc(1,sizeof(WholeFS));
+    if(fs==NULL)
+        assert(0);
+    fs->fileSystemName = Malloc(512, char);
+    strcpy(fs->fileSystemName, fileName);
+        
+    printf("Temp Code %d\n", tmp);
     if(tmp==code) // fresh
     {
-        fs = calloc(1,sizeof(WholeFS));
-        if(fs==NULL)
-            assert(0);
-        fs->fileSystemName = Malloc(512, char);
-        strcpy(fs->fileSystemName, fileName);
-
-
         // super block
         int noOfInodes = NO_OF_INODES; // 8% of total space allocated to inode
         fs->sb.inodeCount = noOfInodes;
@@ -85,6 +103,7 @@ WholeFS* readFS(char const *fileName)
         fs->sb.iNodeOffset = sizeof(SuperBlock)+sizeof(int);
         fs->sb.dataBlockOffset = fs->sb.iNodeOffset+fs->sb.inodeCount*fs->sb.iNodeSize;
 
+
         /* root inode need to be initialized */
         int pwdInodeNumber = getPwdInodeNumber(fs);
         fs->ib[pwdInodeNumber].fileMode = FOLDER_MODE;
@@ -99,11 +118,13 @@ WholeFS* readFS(char const *fileName)
         tmp = FILE_SYSTEM_ALREADY_INITIALIZED;
         fprintf(fp,"%d",tmp);
         //printf("\nFile pointer position : %ld",ftell(fp));
-
+        *isInitialized = 1;
     }
     else // read from the file to memory structure
     {
-        /* TODO */
+        printf("****superblock print");
+        readSuperBlock(fs);
+        
     }
 
     fclose(fp);
@@ -354,30 +375,8 @@ void writeFS(WholeFS *fs, int inodeIndex)
     fclose(fp);
 }
 
-void writeSuperBlock(WholeFS *fs)
-{
-    FILE *fp = fopen(fs->fileSystemName, "r+");
-    int i;
-    // write super block
-    fseek(fp, sizeof(int), SEEK_SET);
-    fprintf(fp, "%d ", fs->sb.inodeCount);
-    fprintf(fp, "%d ", fs->sb.freeInodeCount);
-    fprintf(fp, "%d ", fs->sb.iNodeOffset);
-    fprintf(fp, "%d ", fs->sb.dataBlockOffset);
-    fprintf(fp, "%d ", fs->sb.dataBlockCount);
-    fprintf(fp, "%d ", fs->sb.freeDataBlockCount);
 
-    for(i = 0; i < NO_OF_INODES; i++)
-        fprintf(fp, "%d ", fs->sb.inodeList[i]);
-    
-    for(i = 0; i < NO_OF_DATA_BLOCKS; i++)
-        fprintf(fp, "%d ", fs->sb.dataBlockList[i]);
-    
-    fprintf(fp, "%d ", fs->sb.iNodeSize);
-    fprintf(fp, "%d ", fs->sb.dataBlockSize);
 
-    fclose(fp);
-}
 /*int main(int argc, char const *argv[])
 {
     int inode;
