@@ -19,7 +19,7 @@
 #define FILE_MODE 0
 #define FOLDER_MODE 1
 
-#define DIRECTORY_INDICATOR "/"
+#define DIRECTORY_INDICATOR '/'
 #define FREE 0
 #define OCCUPIED 1
 
@@ -117,7 +117,7 @@ Inode* getInode(WholeFS* fs,int index);
 int isDBlockFree(Inode* i,int index);
 void calculateDataBlockNoAndOffsetToWrite(WholeFS* fs,Inode* i,int inodeIndex, int* index,int* offset);
 int searchFilenameInDataBlock(char* db,char* name,int len);
-int getDBlockNumberFromSize(int size);
+int getDBlockNumberFromSize(WholeFS* fs, int inodeIndex, int nDataBlock);
 void writeFS(WholeFS *fs, int inodeIndex);
 
 #endif

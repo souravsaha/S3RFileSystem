@@ -46,12 +46,13 @@ int main(int argc, char const *argv[])
         printf("Enter 11 to implement touch\n");
         printf("Enter 12 to implement pwd\n");
         printf("Enter 13 to implement unmount\n");
+        printf("Enter 14 to implement mkdir\n");
 
         scanf("%d", &input);
         
         if(!input)
             break;
-        else if ((input < 2) || (input > 13))
+        else if ((input < 2) || (input > 14))
         {
             printf("Invalid input. Please enter again\n");
             continue;
@@ -117,8 +118,7 @@ int main(int argc, char const *argv[])
         case 11:
             printf("Enter the filename\n");
             scanf("%s", fileName);
-            int inode = system_touch( fileSystem, fileName);
-            writeFS(fileSystem, inode);
+            int inode = system_touch( fileSystem, fileName);            
             break;
 
         case 12:
@@ -128,6 +128,11 @@ int main(int argc, char const *argv[])
         case 13:
             //system_unmount(fileSystem);
             mounted = 0;
+            break;
+        case 14:
+            printf("Enter the filename\n");
+            scanf("%s", fileName);
+            system_mkdir(fileSystem,fileName,FOLDER_MODE);
             break;
         default:
             break;
