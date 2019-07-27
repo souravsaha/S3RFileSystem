@@ -11,7 +11,7 @@
 DataBlock* getDataBlockFromIndex(int index)
 {
     char *directoryEntry = "abc 12          xyz 100                   def 17";
-    DataBlock* db = (DataBlock *)malloc(sizeof(DataBlock)); 
+    DataBlock* db = (DataBlock *)malloc(sizeof(DataBlock));
     strcpy(db->content, directoryEntry);
     //db->content = directoryEntry;
     return db;
@@ -19,15 +19,15 @@ DataBlock* getDataBlockFromIndex(int index)
 
 int getNumberOfDataBlockFromSize(int size)
 {
-    return (int)size/DATA_BLOCK_SIZE;
+    return ((int)size/DATA_BLOCK_SIZE + 1);
 }
 
 
 /* char* readDataBlock(WholeFS*fs, FILE *fp, int index)
-{   
+{
     int offset = sizeof(int) + fs->sb.dataBlockOffset + (index * DATA_BLOCK_SIZE);
     fseek(fp, offset, SEEK_SET);
-    
+
     char data[128];
     fgets(data,DATA_BLOCK_SIZE,fp);
     return data;
@@ -48,7 +48,7 @@ void printDirectoryContent(char *data,int size)
         while(c !='\0')
         {
             printf("%c",c);
-            c = data[currentPosition++];   
+            c = data[currentPosition++];
         }
         printf(" ");
         offset += DIRECTORY_ENTRY_LENGTH;
@@ -63,17 +63,17 @@ int getDataBlockIndex(WholeFS* fs, int inodeIndex, int nDataBlock)
     if(nDataBlock < nDirectDataBlock)
         return fs->ib[inodeIndex].directDBIndex[nDataBlock];
     else if((nDataBlock >= nDirectDataBlock) && (nDataBlock < nDirectDataBlock + nEntryInSingleIndirect))
-        return readSingleRedirectDataBlock(fs->ib[inodeIndex].directDBIndex[nDirectDataBlock],nDataBlock - nDirectDataBlock);  
+        return readSingleRedirectDataBlock(fs->ib[inodeIndex].directDBIndex[nDirectDataBlock],nDataBlock - nDirectDataBlock);
 }
 
 int getInodeIndexFromName(WholeFS *fs,char *name,int pdIndex)
 {
     //DataBlock *currentDBBlock  = getDataBlockFromIndex(pdIndex);
     Inode* inode = strToInode(readInodeBlockFromFile(fs,pdIndex),sizeof(Inode));
-    
+
     //TODO : need to do whole content, only first direct block access,
     char *dataBlockContent = readDataBlockFromFile(fs,inode->directDBIndex[0]);
-      
+
     int offset = 0, currentOffset;
     int i, index;
     char dirName[12];
@@ -84,18 +84,18 @@ int getInodeIndexFromName(WholeFS *fs,char *name,int pdIndex)
         if(strcmp(dirName, name) == 0)
         {
             return index;
-        }    
+        }
         offset+= 16;
         sscanf(dataBlockContent + offset,"%d %s",&index,dirName);
     }
-   
+
     return 0;
 }
 
 /* void testReadDataBlock()
 {
     SUPERBLOCK sb = {}
-    WholeFS *fs = 
+    WholeFS *fs =
     FILE* fp = fopen("S3R.fs","r");
 
 } */
@@ -128,17 +128,17 @@ int main(int argc, char const *argv[])
     {
         dir = strtok(path,"/:");
         while(dir!=NULL)
-        {            
+        {
             inodeIndex = getInodeIndexFromName(dir,inodeIndex);
-            printf("string : %s, index : %d\n",dir,inodeIndex);   
-            dir = strtok(NULL,"/:");            
+            printf("string : %s, index : %d\n",dir,inodeIndex);
+            dir = strtok(NULL,"/:");
         }
 
         return 0;
     }
 
-    //perror("not a valid path."); 
-    
+    //perror("not a valid path.");
+
     testPrintDirectory();
     return 0;
 } */
