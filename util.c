@@ -40,7 +40,7 @@ int readSingleRedirectDataBlock(int index,int n)
 
 void printDirectoryContent(char *data,int size)
 {
-    int offset = sizeof(int);
+    int offset = 0;
     while(offset < size)
     {
         int currentPosition = offset;
