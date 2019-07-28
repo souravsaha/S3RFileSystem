@@ -9,6 +9,11 @@ void system_ls(WholeFS* fs,int inodeIndex)
     printf("inodeIndex : %d\n",inodeIndex);
 
     char *data = readInodeBlockFromFile(fs,inodeIndex);
+    if(strlen(data) == 0) // empty
+    {
+        printf("Empty Directory\n");
+        return;
+    }
     Inode* inode = strToInode(data,sizeof(Inode));
     //printf("inode->fileSize: %d\n",inode->fileSize);
 
