@@ -14,7 +14,9 @@ int main(int argc, char const *argv[])
     char *destinationPathName = (char*)malloc(500*sizeof(char));
     char *newFilename = (char*)malloc(100*sizeof(char));
     char *fileName = (char*)malloc(100*sizeof(char));
-
+    char *commandName = (char*)malloc(100*sizeof(char));
+    char *arg1 = (char*)malloc(100*sizeof(char));
+    char *arg2 = (char*)malloc(100*sizeof(char));
     int isInitialized = 0;
     initFS(argv[1]);
     WholeFS* fileSystem = readFS(argv[1],&isInitialized);
@@ -37,6 +39,7 @@ int main(int argc, char const *argv[])
     
     while (mounted == 1)
     {
+        /*
         printf("Enter 0 to exit from the fileSystem\n");
         printf("Enter 2 to change directory\n");
         printf("Enter 3 to implement copy\n");
@@ -51,97 +54,115 @@ int main(int argc, char const *argv[])
         printf("Enter 12 to implement pwd\n");
         printf("Enter 13 to implement unmount\n");
         printf("Enter 14 to implement mkdir\n");
-
-        scanf("%d", &input);
+        */
+        printf(">> \n");
+        printf("cd \t cp \t mv \t ls \t put\n");
+        printf("get \t rm \t ll \t cat \t touch\n");
+        printf("pwd \t unmount \t mkdir\n");
+        scanf("%s", commandName);
         
-        if(!input)
-            break;
-        else if ((input < 2) || (input > 14))
+        if (strcmp(commandName, "cd") == 0)
         {
-            printf("Invalid input. Please enter again\n");
-            continue;
-        }
-        
-        switch (input)
-        {
-        case 2:
             printf("Enter the pathname\n");
-            scanf("%s", pathName);
-            system_cd( fileSystem, pathName);
-            break;
-        
-        case 3:
-            printf("Enter the pathname to copy from\n");
-            scanf("%s", sourcePathName);
-            printf("Enter the pathname to copy to\n");
-            scanf("%s", destinationPathName);
-            //system_cp( fileSystem, sourcePathName, destinationPathName);
-            break;
-
-        case 4:
-            printf("Enter the pathname to move from\n");
-            scanf("%s", sourcePathName);
-            printf("Enter the pathname to move to\n");
-            scanf("%s", destinationPathName);
-            //system_mv( fileSystem, sourcePathName, destinationPathName);
-            break;
-
-        case 5:
+            scanf("%s", arg1);
+            system_cd( fileSystem, arg1);
+            //break;
+        }
+        else if(strcmp(commandName, "cp") == 0)
+        {
+            printf("Currently under development\n");
+            //printf("Enter the pathname to copy from\n");
+            //scanf("%s", arg1);
+            //printf("Enter the pathname to copy to\n");
+            //scanf("%s", arg2);
+            //system_cp( fileSystem, arg1, arg2);
+            //break;
+        }
+        else if(strcmp(commandName, "mv") == 0)
+        {
+            printf("Currently under development\n");
+            //printf("Enter the pathname to move from\n");
+            //scanf("%s", arg1);
+            //printf("Enter the pathname to move to\n");
+            //scanf("%s", arg2);
+            //system_mv( fileSystem, arg1, arg2);
+            //break;
+        }
+        else if(strcmp(commandName, "ls") == 0)
+        {
             inodeNumber = getPwdInodeNumber(fileSystem);
             system_ls( fileSystem, inodeNumber);
-            break;
-
-        case 6:
-            printf("Enter the pathname\n");
-            scanf("%s", pathName);
-            //system_put( fileSystem, pathName);
-            break;
-
-        case 7:
-            printf("Enter the pathname\n");
-            scanf("%s", pathName);
-            //system_get( fileSystem, pathName);
-            break;
-
-        case 8:
-            printf("Enter the pathname\n");
-            scanf("%s", pathName);
-            //system_rm( fileSystem, pathName);
-            break;
-
-        case 9:
+            //break;
+        }
+        else if(strcmp(commandName, "put") == 0)
+        {
+            printf("Currently under development\n");
+            //printf("Enter the pathname\n");
+            //scanf("%s", arg1);
+            //system_put( fileSystem, arg1);
+            //break;
+        }
+        else if(strcmp(commandName, "get") == 0)
+        {
+            printf("Currently under development\n");
+            //printf("Enter the pathname\n");
+            //scanf("%s", arg1);
+            //system_get( fileSystem, arg1);
+            //break;
+        }
+        else if(strcmp(commandName, "rm") == 0)
+        {
+            printf("Currently under development\n");
+            //printf("Enter the pathname\n");
+            //scanf("%s", arg1);
+            //system_rm( fileSystem, arg1);
+            //break;
+        }
+        else if(strcmp(commandName, "ll") == 0)
+        {
+            printf("Currently under development\n");
             //system_ll(fileSystem);
-            break;
-
-        case 10:
-            printf("Enter the filename\n");
-            scanf("%s", fileName);
-            //system_cat( fileSystem, fileName);
-            break;
-
-        case 11:
-            printf("Enter the filename\n");
-            scanf("%s", fileName);
-            int inode = system_touch( fileSystem, fileName, FILE_MODE);            
-            break;
-
-        case 12:
-            system_pwd(fileSystem);
-            break;
-
-        case 13:
+            //break;
+        }
+        else if(strcmp(commandName, "cat") == 0)
+        {
+            printf("Currently under development\n");
+            //printf("Enter the filename\n");
+            //scanf("%s", arg1);
+            //system_cat( fileSystem, arg1);
+            //break;
+        }
+        else if(strcmp(commandName, "touch") == 0)
+        {
+            //printf("Enter the filename\n");
+            scanf("%s", arg1);
+            int inode = system_touch( fileSystem, arg1, FILE_MODE);            
+            //break;    
+        }
+        else if(strcmp(commandName, "pwd") == 0)
+        {
+            printf("Currently under development\n");
+            //system_pwd(fileSystem);
+            //break;
+        }
+        else if(strcmp(commandName, "unmount") == 0)
+        {
             //system_unmount(fileSystem);
             mounted = 0;
             writeSuperBlock(fileSystem);
 
-            break;
-        case 14:
-            printf("Enter the filename\n");
-            scanf("%s", fileName);
-            system_mkdir(fileSystem,fileName,FOLDER_MODE);
-            break;
-        default:
-            break;
+            //break;
+        }
+        else if(strcmp(commandName, "mkdir") == 0)
+        {
+            //printf("Enter the filename\n");
+            scanf("%s", arg1);
+            system_mkdir(fileSystem,arg1,FOLDER_MODE);
+            //break;
+        }
+        else
+        {
+            printf("Command Not found! \n");
         }
     }
 
