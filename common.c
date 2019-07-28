@@ -2,6 +2,7 @@
 #include "util.h"
 #include "file_handling_functions.h"
 
+
 int getPwdInodeNumber(WholeFS* fs)
 {
     printf("PWD Inode : %d\n",fs->pwdInodeNumber);
@@ -130,6 +131,7 @@ WholeFS* readFS(char const *fileName,int* isInitialized)
         fs->sb.iNodeSize = sizeof(Inode);
         fs->sb.dataBlockSize = DATA_BLOCK_SIZE;
         fs->pwdInodeNumber = 1;
+        strcpy(fs->pwdPath,"/");
 
         int dataBlockNum = NO_OF_DATA_BLOCKS;
         fs->sb.dataBlockCount = dataBlockNum;

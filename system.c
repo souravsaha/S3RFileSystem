@@ -3,6 +3,8 @@
 #include "file_handling_functions.h"
 
 
+
+
 void system_ls(WholeFS* fs,int inodeIndex)
 {
     printf("system_ls\n");
@@ -38,14 +40,16 @@ void system_ls(WholeFS* fs,int inodeIndex)
     }
 }
 
-int system_cd(WholeFS* fs, char* path)
+int system_cd(WholeFS* fs, char* _path)
 {
+    char *path = Malloc(strlen(_path),char);
+    strcpy(path,_path); 
     char *dir;
     int i = 0;
     int inodeIndex;
     if(path[0] == '/')
     {
-        //printf("In SYSTEM_cd.... Path : %s\n",path);
+        printf("In SYSTEM_cd.... Path : %s\n",path);
         inodeIndex = 1;
         dir = strsep(&path,"/");
         dir = strsep(&path,"/");
@@ -57,11 +61,11 @@ int system_cd(WholeFS* fs, char* path)
         dir = strsep(&path,"/");
     }
         
-    //printf("DIR : %s \n",dir);
-    while(dir != NULL)
+    printf("DIR : %s \n",dir);
+    while(dir != NULL && strlen(dir) > 0 )
     {
         inodeIndex = getInodeIndexFromName(fs, dir, inodeIndex);
-        //printf("DIR : %s, Inode : %d\n",dir,inodeIndex);
+        printf("DIR : %s, Inode : %d\n",dir,inodeIndex);
         if(inodeIndex == 0)
         {
             perror("path not found\n");
@@ -69,16 +73,34 @@ int system_cd(WholeFS* fs, char* path)
         }
         
         dir = strsep(&path,"/");
+
     }
 
+    printf("Path : %s\n",_path);
     fs->pwdInodeNumber = inodeIndex;
-    printf("PWD Inode : %d\n",inodeIndex);
+    if(_path[0] == '/')
+    {
+
+        strcpy(fs->pwdPath,_path);
+    }    
+    else
+    {
+        if(strcmp(fs->pwdPath,"/"))
+            strcat(fs->pwdPath,"/");
+        strcat(fs->pwdPath,_path);
+    } 
+    printf("PWD Inode : %d, Path : %s \n",inodeIndex,fs->pwdPath);
     
     return 0;
 }
 
 
-int system_rm(WholeFS* fs,char* name,int len)
+void system_pwd(WholeFS *fs)
+{
+    printf("pwd Path: %s \n",fs->pwdPath);
+}
+
+/* int system_rm(WholeFS* fs,char* name,int len)
 {
     printf("###################################################################");
     // get current inode number of current working directory
@@ -130,10 +152,10 @@ int system_rm(WholeFS* fs,char* name,int len)
                     
                     strncpy(buff+entryNo*DIRECTORY_ENTRY_LENGTH,entryBuffer,DIRECTORY_ENTRY_LENGTH);
 
-                    /*mark inode no and corresponding data blocks free */
+                    //mark inode no and corresponding data blocks free 
 
                     isFileDeleted = 1;
-                    /* */
+                
                     printf("after Buffer: %s\n",buff);
                     break;
                 }
@@ -147,7 +169,7 @@ int system_rm(WholeFS* fs,char* name,int len)
     else
         return 0;
 
-}
+} */
 
 
 int system_touch(WholeFS* fs,char* name, int fileType)
@@ -310,5 +332,4 @@ void system_mv(WholeFS *fs, char* moveFrom, char* moveTo)
     fseek(fp, dbOffset , SEEK_CUR);
     fprintf(fp, "%d %s", inodeNum, dirName);
 
-}
-*/
+}*/

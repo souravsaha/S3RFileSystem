@@ -126,7 +126,7 @@ int main(int argc, char const *argv[])
             break;
 
         case 12:
-            //system_pwd(fileSystem);
+            system_pwd(fileSystem);
             break;
 
         case 13:

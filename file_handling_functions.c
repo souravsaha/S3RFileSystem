@@ -80,7 +80,7 @@ void readSuperBlock(WholeFS* fs)
     printf("datablocksize: %d ", (fs->sb.dataBlockSize));
     
     fs->pwdInodeNumber = 1;
-
+    strcpy(fs->pwdPath,"/");
     fclose(fp);
 }
 

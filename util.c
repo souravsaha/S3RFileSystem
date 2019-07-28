@@ -141,7 +141,7 @@ int getInodeIndexFromName(WholeFS *fs,char *name,int pdIndex)
     printDirectoryContent(content,size);
 } */
 
-char* makeDirString(char* filename, int len, int inodeNo)
+/* char* makeDirString(char* filename, int len, int inodeNo)
 {
     int i, j, inodeNumDigit=0;
     char* buffer = (char*)malloc((INODE_NO_STRING_SIZE + FILE_NAME_STRING_SIZE)*sizeof(char));
@@ -196,7 +196,7 @@ char* makeDirString(char* filename, int len, int inodeNo)
     }
     printf("%s", buffer);
     return buffer;
-}
+} */
 
 
 
