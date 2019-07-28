@@ -100,7 +100,7 @@ void system_pwd(WholeFS *fs)
     printf("Path: %s \n",fs->pwdPath);
 }
 
-/* int system_rm(WholeFS* fs,char* name,int len)
+int system_rm(WholeFS* fs,char* name,int len)
 {
     printf("###################################################################");
     // get current inode number of current working directory
@@ -210,7 +210,7 @@ void system_pwd(WholeFS *fs)
     else
         return 0;
 
-} */
+} 
 
 
 int system_touch(WholeFS* fs,char* name, int fileType)

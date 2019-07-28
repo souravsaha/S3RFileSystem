@@ -164,7 +164,7 @@ int getInodeIndexFromName(WholeFS *fs,char *name,int pdIndex)
     assert(len<=FILE_NAME_STRING_SIZE);
     //printf("inode digits: %d\n",inodeNumDigit);
 
-    /*
+    
     if (inodeNo==0)
     {
         //printf("This inode is invalid.\n");
@@ -210,9 +210,9 @@ int getInodeIndexFromName(WholeFS *fs,char *name,int pdIndex)
     }
     printf("%s", buffer);
     return buffer;
-} */
+} 
 
-
+*/
 
 /*
 int main(int argc, char const *argv[])
