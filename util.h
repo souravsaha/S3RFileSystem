@@ -6,7 +6,7 @@
 DataBlock* getDataBlockFromIndex(int index);
 int getNumberOfDataBlockFromSize(int size);
 int readSingleRedirectDataBlock(int index,int n);
-void printDirectoryContent(char *data,int size);
+void printDirectoryContent(WholeFS* fs,char *data,int size);
 int getDataBlockIndex(WholeFS* fs, int inodeIndex, int nDataBlock);
 int getInodeIndexFromName(WholeFS *fs,char *name,int pdIndex);
 void testPrintDirectory();

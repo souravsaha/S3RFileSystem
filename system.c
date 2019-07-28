@@ -28,7 +28,7 @@ void system_ls(WholeFS* fs,int inodeIndex)
        char *data = readDataBlockFromFile(fs,indexDataBlock);
        printf("data : %s\n",data);
        //printf("data :%s\n",readDataBlockFromFile(fs,indexDataBlock));
-       printDirectoryContent(data,DATA_BLOCK_SIZE);
+       printDirectoryContent(fs,data,DATA_BLOCK_SIZE);
     }
 }
 
