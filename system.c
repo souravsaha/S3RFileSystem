@@ -66,8 +66,10 @@ int system_cd(WholeFS* fs, char* path)
 
 int system_rm(WholeFS* fs,char* name,int len)
 {
+    printf("###################################################################");
     // get current inode number of current working directory
     int dirInode = getPwdInodeNumber(fs);
+
     // get Inode of the pwd directory
     Inode* parentDirInode = getInode(fs,dirInode);
     int totalBlocksOccupied = parentDirInode->fileSize/DATA_BLOCK_SIZE;
@@ -94,20 +96,38 @@ int system_rm(WholeFS* fs,char* name,int len)
                 int dataBlockIndex = parentDirInode->directDBIndex[i];
 
                 char* buff = readDataBlockFromFile(fs,dataBlockIndex);
+                printf("b4 Buffer: %s\n",buff);
                 // read every 16 bit line from the data block and
                 // check if there is a match
-                int blockOffset = searchFilenameInDataBlock(buff,name,len);
-                if(blockOffset != -1)
+                int entryNo = searchFilenameInDataBlock(buff,name,strlen(name));
+                if(entryNo != -1)
                 {
                     // write the inode no 0 at offset
                     // inode_no filename --> 0 filename
                     // TODO
+
+                    char* entryBuffer = makeDirString(name,strlen(name),0);
+
+
+                    if(entryBuffer==NULL)
+                        assert(0);
+
+                    printf("[system_rm]Composed: %s",entryBuffer);
+                    
+                    strncpy(buff+entryNo*DIRECTORY_ENTRY_LENGTH,entryBuffer,DIRECTORY_ENTRY_LENGTH);
+
+                    /*mark inode no and corresponding data blocks free */
+
                     isFileDeleted = 1;
+                    /* */
+                    printf("after Buffer: %s\n",buff);
                     break;
                 }
             }
         }
     }
+
+    printf("###################################################################");
     if(isFileDeleted)
         return 1;  // modify if needed
     else

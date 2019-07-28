@@ -84,6 +84,7 @@ Inode* strToInode(char* buffer,int len)
     printf("newNode fileMode : %d,linkCount : %d,filesize: %d DB[0]: %d\n",newNode->fileMode,newNode->linkCount,newNode->fileSize,newNode->directDBIndex[0]);
     return newNode;
 }
+
 /*
 int main()
 {
@@ -314,19 +315,58 @@ void getFirstNewDataBlock(WholeFS* fs,Inode* i,int inodeIndex, int* index,int* o
 
 }
 
-// given a block, searches filename in the block
-// returns the offset where the block is found
+// given a block, searches filename 'name' with length 'len' in the block
+// returns the index of the block where the block is found
 // else -1
 int searchFilenameInDataBlock(char* db,char* name,int len)
 {
-    char* ptr = strstr(db,name);
+    // buffer to store filename beginning and ending with space
+    char save[len+2+1]; 
+    save[0] = ' ';
+    int i = 1;
+    for(i=0;i<len;i++)
+    {
+        save[i+1] = name[i];
+    }
+    save[i+1] = ' ';
+    save[i+2] = '\0';
+
+    printf("[searchFilenameInDataBlock]save = %s\n",save);
+
+    char* ptr = strstr(db,save);
+
+    // extract the number
+
+
     if(ptr)
     {
+        /*
+        --ptr; //go to the last digit of inode
+
+        // read while you get digit
+        int sum = 0;
+        int mult = 1;
+        while(*ptr - '0' >= 0 && *ptr-0 <= 9)
+        {
+            int d = *ptr - '0';
+            sum = sum+ d*mult;
+            mult = mult*10;
+            printf("[searchFilenameInDataBlock]inode digit %d sum=%d\n",d,sum);
+
+            ptr--;
+        }
+        return 1;
+         */
+
+        long int ptrDiff = ptr - db;
+        int index = ptrDiff/DIRECTORY_ENTRY_LENGTH;
+        printf("[searchFilenameInDataBlock]index = %d\n",index);
+        return index;
 
     }
     else
         return -1;
-    return -1; // dummy
+    
 }
 
 
