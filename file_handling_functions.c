@@ -12,7 +12,8 @@ char* readNbytesFromOffset(int n,int offset, char *fileSystemName)
     char* data = (char*) malloc((n+1)*sizeof(char));
      if(data==NULL)
         assert(0);
-    fgets(data,n+1,fp);
+    //fgets(data,n+1,fp);
+    fread(data,sizeof(char), DATA_BLOCK_SIZE, fp);
     printf("Data in syscall :%s\n",data);
     fclose(fp);
     return data;
@@ -97,10 +98,21 @@ int writeNBytesToOffset(char* buffer,int n,int offset, char *fileSystemName)
     return byteWritten;
 }
 
+// write in a data block at some offset
 int writeDataBlockToFile(WholeFS*fs,char* blockBuffer,int existingFileSize,  int index)
 {
 
     int offset = fs->sb.dataBlockOffset + (index * DATA_BLOCK_SIZE) + (existingFileSize % DATA_BLOCK_SIZE);
+
+    int byteWritten = writeNBytesToOffset(blockBuffer,DATA_BLOCK_SIZE,offset, fs->fileSystemName);
+    return byteWritten;
+}
+
+// write entire data block to file
+int writeEntireDataBlockToFile(WholeFS*fs,char* blockBuffer,  int index)
+{
+
+    int offset = fs->sb.dataBlockOffset + (index * DATA_BLOCK_SIZE) ;
 
     int byteWritten = writeNBytesToOffset(blockBuffer,DATA_BLOCK_SIZE,offset, fs->fileSystemName);
     return byteWritten;

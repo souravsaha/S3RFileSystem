@@ -317,9 +317,11 @@ void getFirstNewDataBlock(WholeFS* fs,Inode* i,int inodeIndex, int* index,int* o
 
 // given a block, searches filename 'name' with length 'len' in the block
 // returns the index of the block where the block is found
-// else -1
+/// else -1
 int searchFilenameInDataBlock(char* db,char* name,int len)
 {
+    return 0;
+    
     // buffer to store filename beginning and ending with space
     char save[len+2+1]; 
     save[0] = ' ';
@@ -328,17 +330,44 @@ int searchFilenameInDataBlock(char* db,char* name,int len)
     {
         save[i+1] = name[i];
     }
-    save[i+1] = ' ';
-    save[i+2] = '\0';
+    save[i+1] = '\0';
+    //save[i+2] = '\0';
 
     printf("[searchFilenameInDataBlock]save = %s\n",save);
 
     char* ptr = strstr(db,save);
 
+    // matcstring
+    int j,matchpoint=-1;
+    int found = 0;
+    for (i = 0; i < DATA_BLOCK_SIZE;i++)
+    {
+        int t=i;
+        int matchcount = 0;
+        for(j=0;j<strlen(save);j++)
+        {
+            if(db[t]!=save[j])
+            {
+                break;
+            }
+            else{ // char match
+                matchcount++;
+                t++;
+            }
+        }
+        if(matchcount==strlen(save))
+        {
+            matchpoint = i;
+            break;
+        }
+
+    }
+    
+    //printf("[searchFilenameInDataBlock]matchIdx = %d\n",matchpoint);
     // extract the number
 
 
-    if(ptr)
+    if(0)//(index!= -1)
     {
         /*
         --ptr; //go to the last digit of inode

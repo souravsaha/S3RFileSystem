@@ -15,4 +15,5 @@
     void writeSuperNodeBlockToFile(WholeFS*fs,char* blockBuffer);
     void readSuperBlock(WholeFS* fs);
     void writeSuperBlock(WholeFS* fs);
+    int writeEntireDataBlockToFile(WholeFS*fs,char* blockBuffer,  int index);
 #endif

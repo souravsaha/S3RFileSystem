@@ -70,18 +70,22 @@ int system_rm(WholeFS* fs,char* name,int len)
     // get current inode number of current working directory
     int dirInode = getPwdInodeNumber(fs);
 
+    
     // get Inode of the pwd directory
     Inode* parentDirInode = getInode(fs,dirInode);
-    int totalBlocksOccupied = parentDirInode->fileSize/DATA_BLOCK_SIZE;
 
+    // calculate no of data blocks for parent dir
+    int totalBlocksOccupied = parentDirInode->fileSize/DATA_BLOCK_SIZE;
+    if(parentDirInode->fileSize%DATA_BLOCK_SIZE != 0)
+        totalBlocksOccupied++;
     // only 1st level link
     assert(totalBlocksOccupied<=DIRECT_DATA_BLOCK_NUMBER);
 
     // get the data block of the directory files
     int isFileDeleted = 0;
-
-    while(!isFileDeleted)
-    {
+    int notFound = 1;
+    //while(isFileDeleted == 0 )
+    //{
         int i=0;
         // iterate through the directory data blocks in search of
         // the line containing the filename
@@ -96,7 +100,38 @@ int system_rm(WholeFS* fs,char* name,int len)
                 int dataBlockIndex = parentDirInode->directDBIndex[i];
 
                 char* buff = readDataBlockFromFile(fs,dataBlockIndex);
-                printf("b4 Buffer: %s\n",buff);
+
+                int offset = 0;
+                int i, index;
+                char dirName[12];
+                sscanf(buff + offset,"%d %s",&index,dirName);
+
+                int findInode = -1;
+                int findOffset = -1;
+
+                //pirintf("Directory name : %s\n",dirName);
+                while(offset <DATA_BLOCK_SIZE)
+                {
+                    if(strcmp(dirName, name) == 0)
+                    {
+                        //return index;
+                        findOffset = offset;
+                        findInode = index;
+                        break;
+                    }
+                    offset+= 16;
+                    sscanf(buff + offset,"%d %s",&index,dirName);
+                }
+                printf("offset %d\n",findOffset);
+
+                sprintf(buff+offset,"%d %s",0,name);
+                isFileDeleted = 1;
+                printf("after Buffer: %s\n",buff);
+                writeEntireDataBlockToFile(fs,buff,dataBlockIndex);
+                // clear inode TODO
+
+                /*
+                printf("b4 Buffer: %s len=%d\n",buff,strlen(buff));
                 // read every 16 bit line from the data block and
                 // check if there is a match
                 int entryNo = searchFilenameInDataBlock(buff,name,strlen(name));
@@ -115,17 +150,23 @@ int system_rm(WholeFS* fs,char* name,int len)
                     printf("[system_rm]Composed: %s",entryBuffer);
                     
                     strncpy(buff+entryNo*DIRECTORY_ENTRY_LENGTH,entryBuffer,DIRECTORY_ENTRY_LENGTH);
-
-                    /*mark inode no and corresponding data blocks free */
-
-                    isFileDeleted = 1;
-                    /* */
-                    printf("after Buffer: %s\n",buff);
-                    break;
-                }
+                    
+                    //writeEntireDataBlockToFile(fs,buff,parentDirInode->fileSize,dataBlockIndex);
+                    writeEntireDataBlockToFile(fs,buff,dataBlockIndex);
+                    
+                    */
+                    
+                   // break;
+                //}
             }
+            else
+            {
+                assert(0);
+            }
+            
         }
-    }
+        
+    //}
 
     printf("###################################################################");
     if(isFileDeleted)

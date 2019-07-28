@@ -10,6 +10,6 @@ void printDirectoryContent(char *data,int size);
 int getDataBlockIndex(WholeFS* fs, int inodeIndex, int nDataBlock);
 int getInodeIndexFromName(WholeFS *fs,char *name,int pdIndex);
 void testPrintDirectory();
-
+char* makeDirString(char* filename, int len, int inodeNo);
 
 #endif

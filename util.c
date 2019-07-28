@@ -140,9 +140,11 @@ char* makeDirString(char* filename, int len, int inodeNo)
     assert(len<=FILE_NAME_STRING_SIZE);
     //printf("inode digits: %d\n",inodeNumDigit);
 
+    /*
     if (inodeNo==0)
     {
-        printf("This inode is invalid.\n");
+        //printf("This inode is invalid.\n");
+        
         return;
     }
 
@@ -151,29 +153,35 @@ char* makeDirString(char* filename, int len, int inodeNo)
         printf("This is the root inode.\n");
         return;
     }
-    copyInode = inodeNo;
-    for (i=inodeNumDigit-1; i>=0; i--)
+     */
+    if(inodeNo==1 || inodeNo==0)
     {
-        buffer[i] = (copyInode%10)+'0';
-        //printf("%c\n",buffer[i]);
-        copyInode /= 10;
+        inodeNumDigit = 1;
+        buffer[0] = inodeNo+'0';
     }
+    else{
+        for (i=inodeNumDigit-1; i>=0; i--)
+        {
+            buffer[i] = (copyInode%10)+'0';
+            //printf("%c\n",buffer[i]);
+            copyInode /= 10;
+        }
+    }
+    // add one space
+    buffer[inodeNumDigit] = ' ';
 
-    for (i=inodeNumDigit; i<INODE_NO_STRING_SIZE; i++)
-    {
-        buffer[i] = '*';
-        //printf("%c\n",buffer[i]);
-    }
+    // write string
     int k=0;
-    for (i=INODE_NO_STRING_SIZE; i<INODE_NO_STRING_SIZE + len; i++)
+    for (i=inodeNumDigit+1; i<INODE_NO_STRING_SIZE + len; i++)
     {
         buffer[i] = filename[k];
         //printf("%c\n",buffer[i]);
         k++;
     }
-    for (i = INODE_NO_STRING_SIZE + len; i < INODE_NO_STRING_SIZE + FILE_NAME_STRING_SIZE; i++)
+    // fill the rest with space
+    for (; i < INODE_NO_STRING_SIZE + FILE_NAME_STRING_SIZE; i++)
     {
-        buffer[i] =  '*';
+        buffer[i] =  ' ';
         //printf("%c\n",buffer[i]);
     }
     printf("%s", buffer);
