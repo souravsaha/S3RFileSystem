@@ -63,7 +63,7 @@ int main(int argc, char const *argv[])
         
         if (strcmp(commandName, "cd") == 0)
         {
-            printf("Enter the pathname\n");
+            //printf("Enter the pathname\n");
             scanf("%s", arg1);
             system_cd( fileSystem, arg1);
             //break;
@@ -141,8 +141,8 @@ int main(int argc, char const *argv[])
         }
         else if(strcmp(commandName, "pwd") == 0)
         {
-            printf("Currently under development\n");
-            //system_pwd(fileSystem);
+            //printf("Currently under development\n");
+            system_pwd(fileSystem);
             //break;
         }
         else if(strcmp(commandName, "unmount") == 0)

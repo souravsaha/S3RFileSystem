@@ -5,7 +5,7 @@
 
 int getPwdInodeNumber(WholeFS* fs)
 {
-    printf("PWD Inode : %d\n",fs->pwdInodeNumber);
+    //printf("PWD Inode : %d\n",fs->pwdInodeNumber);
     return fs->pwdInodeNumber;
 }
 // TODO take filesize as argument
@@ -42,7 +42,7 @@ Inode* strToInode(char* buffer,int len)
 {
     
     //printf("In strToInode\n");
-    printf("buff : %s\n",buffer);
+    //printf("buff : %s\n",buffer);
     Inode* newNode = (Inode*)malloc(sizeof(Inode));
     assert(newNode!=NULL);
 
@@ -82,7 +82,7 @@ Inode* strToInode(char* buffer,int len)
             newNode->directDBIndex[i++] = atoi(token);
 
     }
-    printf("newNode fileMode : %d,linkCount : %d,filesize: %d DB[0]: %d\n",newNode->fileMode,newNode->linkCount,newNode->fileSize,newNode->directDBIndex[0]);
+    //printf("newNode fileMode : %d,linkCount : %d,filesize: %d DB[0]: %d\n",newNode->fileMode,newNode->linkCount,newNode->fileSize,newNode->directDBIndex[0]);
     return newNode;
 }
 
@@ -163,7 +163,12 @@ WholeFS* readFS(char const *fileName,int* isInitialized)
     {
         printf("****superblock print");
         readSuperBlock(fs);
-        
+        char *buff = readInodeBlockFromFile(fs,fs->pwdInodeNumber);
+        Inode *inode = strToInode(buff,sizeof(Inode));
+        fs->ib[fs->pwdInodeNumber].fileMode = inode->fileMode;
+        fs->ib[fs->pwdInodeNumber].linkCount = inode->linkCount;
+        fs->ib[fs->pwdInodeNumber].directDBIndex[0] =inode->directDBIndex[0];
+        fs->ib[fs->pwdInodeNumber].fileSize = inode->fileSize;
     }
 
     fclose(fp);
@@ -223,7 +228,7 @@ int getFirstFreeInodeIndex(WholeFS* fs)
 // mark it allocated
 int getFirstFreeDataBlockIndex(WholeFS* fs)
 {
-    printf("in getFirstFreeDataBlockIndex function\n");
+    //printf("in getFirstFreeDataBlockIndex function\n");
     int i;
     if(fs->sb.freeDataBlockCount==0)
         assert(0);
@@ -231,7 +236,7 @@ int getFirstFreeDataBlockIndex(WholeFS* fs)
     // first two data blocks are reserved
     for(i=2;i<fs->sb.dataBlockCount;i++)
     {
-        printf("Data Block Index %d = %d \n", i, fs->sb.dataBlockList[i]);
+        //printf("Data Block Index %d = %d \n", i, fs->sb.dataBlockList[i]);
         if(fs->sb.dataBlockList[i]==FREE)
         {
             //fs->sb.dataBlockList[i] = OCCUPIED;
@@ -276,7 +281,7 @@ void calculateDataBlockNoAndOffsetToWrite(WholeFS* fs,Inode* i,int inodeIndex, i
         if(isDBlockFree(i,blockIndexInInode))
         {
             idx = getFirstFreeDataBlockIndex(fs);
-            printf("Data Block index : %d\n",idx);
+            //printf("Data Block index : %d\n",idx);
             fs->sb.dataBlockList[idx] = OCCUPIED;
             fs->sb.freeDataBlockCount--;
             i->directDBIndex[blockIndexInInode] = idx;
@@ -435,8 +440,8 @@ void writeFS(WholeFS *fs, int inodeIndex)
 
     //printf("Data Block Offset : %d \n",fs->sb.dataBlockOffset);
 
-    printf("offset value : %d \n", offset);
-    printf("data block offset : %d \n", fs->sb.dataBlockOffset);
+    //printf("offset value : %d \n", offset);
+    //printf("data block offset : %d \n", fs->sb.dataBlockOffset);
 
 
     DataBlock* db = &(fs->db[rootInodeIndex]);
@@ -474,7 +479,7 @@ void writeFS(WholeFS *fs, int inodeIndex)
     fprintf(fp, "%d ", fs->ib[inodeIndex].fileSize);
 
 
-    printf("Inode WriteFS : %d, DB[0]: %d\n",inodeIndex,fs->ib[inodeIndex].directDBIndex[0]);
+    //printf("Inode WriteFS : %d, DB[0]: %d\n",inodeIndex,fs->ib[inodeIndex].directDBIndex[0]);
     for(i = 0; i<DIRECT_DATA_BLOCK_NUMBER; i++)
         fprintf(fp, "%d ", fs->ib[inodeIndex].directDBIndex[i]);
    

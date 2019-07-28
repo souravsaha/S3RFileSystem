@@ -7,9 +7,9 @@
 
 void system_ls(WholeFS* fs,int inodeIndex)
 {
-    printf("system_ls\n");
+    /* printf("system_ls\n");
     printf("-------------------\n");
-    printf("inodeIndex : %d\n",inodeIndex);
+    printf("inodeIndex : %d\n",inodeIndex); */
 
     char *data = readInodeBlockFromFile(fs,inodeIndex);
     if(strlen(data) == 0) // empty
@@ -23,18 +23,18 @@ void system_ls(WholeFS* fs,int inodeIndex)
 
 
     int nDataBlock = getNumberOfDataBlockFromSize(inode->fileSize);
-    printf("nDataBlocks : %d\n", nDataBlock);
-    printf("-------------------\n");
+    /* printf("nDataBlocks : %d\n", nDataBlock);
+    printf("-------------------\n"); */
 
     int indexDataBlock, i = 0;
-    printf("i : %d, nDataBlock : %d\n",i,nDataBlock);
+    //printf("i : %d, nDataBlock : %d\n",i,nDataBlock);
     while(i < nDataBlock)
     {
-       printf("in while loop\n");
+       //printf("in while loop\n");
        indexDataBlock =  getDataBlockIndex(fs,inodeIndex,i++);
-       printf("indexDataBlock : %d\n",indexDataBlock);
+       //printf("indexDataBlock : %d\n",indexDataBlock);
        char *data = readDataBlockFromFile(fs,indexDataBlock);
-       printf("data : %s\n",data);
+       //printf("data : %s\n",data);
        //printf("data :%s\n",readDataBlockFromFile(fs,indexDataBlock));
        printDirectoryContent(fs,data,inode->fileSize);
     }
@@ -49,7 +49,7 @@ int system_cd(WholeFS* fs, char* _path)
     int inodeIndex;
     if(path[0] == '/')
     {
-        printf("In SYSTEM_cd.... Path : %s\n",path);
+        //printf("In SYSTEM_cd.... Path : %s\n",path);
         inodeIndex = 1;
         dir = strsep(&path,"/");
         dir = strsep(&path,"/");
@@ -61,11 +61,11 @@ int system_cd(WholeFS* fs, char* _path)
         dir = strsep(&path,"/");
     }
         
-    printf("DIR : %s \n",dir);
+    //printf("DIR : %s \n",dir);
     while(dir != NULL && strlen(dir) > 0 )
     {
         inodeIndex = getInodeIndexFromName(fs, dir, inodeIndex);
-        printf("DIR : %s, Inode : %d\n",dir,inodeIndex);
+        //printf("DIR : %s, Inode : %d\n",dir,inodeIndex);
         if(inodeIndex == 0)
         {
             perror("path not found\n");
@@ -76,7 +76,7 @@ int system_cd(WholeFS* fs, char* _path)
 
     }
 
-    printf("Path : %s\n",_path);
+    //printf("Path : %s\n",_path);
     fs->pwdInodeNumber = inodeIndex;
     if(_path[0] == '/')
     {
@@ -89,7 +89,7 @@ int system_cd(WholeFS* fs, char* _path)
             strcat(fs->pwdPath,"/");
         strcat(fs->pwdPath,_path);
     } 
-    printf("PWD Inode : %d, Path : %s \n",inodeIndex,fs->pwdPath);
+    printf("Path : %s \n",fs->pwdPath);
     
     return 0;
 }
@@ -97,7 +97,7 @@ int system_cd(WholeFS* fs, char* _path)
 
 void system_pwd(WholeFS *fs)
 {
-    printf("pwd Path: %s \n",fs->pwdPath);
+    printf("Path: %s \n",fs->pwdPath);
 }
 
 /* int system_rm(WholeFS* fs,char* name,int len)
@@ -190,7 +190,7 @@ void system_pwd(WholeFS *fs)
                     //writeEntireDataBlockToFile(fs,buff,parentDirInode->fileSize,dataBlockIndex);
                     writeEntireDataBlockToFile(fs,buff,dataBlockIndex);
                     
-                    */
+                    
                     
                    // break;
                 //}
@@ -220,7 +220,7 @@ int system_touch(WholeFS* fs,char* name, int fileType)
     int dataBlockidx = getFirstFreeDataBlockIndex(fs); //get first free data block
     fs->sb.dataBlockList[dataBlockidx] = OCCUPIED;
     fs->sb.freeDataBlockCount--;
-    printf("Free Inode no :%d\n",inodeIndex);
+    //printf("Free Inode no :%d\n",inodeIndex);
 
     fs->sb.inodeList[inodeIndex] = OCCUPIED;
     fs->ib[inodeIndex].fileMode = fileType; // this is a file / directory
@@ -252,11 +252,11 @@ int system_touch(WholeFS* fs,char* name, int fileType)
     fs->ib[inodeIndex].directDBIndex[0] = dataBlockidx;
 
     // add a 16byte entry in the parent directory
-    printf("\nblockNo = %d offset= %d\n",blockNo,blockOffset);
+    //printf("\nblockNo = %d offset= %d\n",blockNo,blockOffset);
 
     char buffer[16];
     sprintf(buffer,"%d %s ",inodeIndex,name);
-    printf("Buffer content %s \n", buffer);
+    //printf("Buffer content %s \n", buffer);
     int pwdInodeNumber = getPwdInodeNumber(fs);
 
     // still can append in the last block
@@ -273,7 +273,7 @@ int system_touch(WholeFS* fs,char* name, int fileType)
         DataBlock* d = readDataBlock(fs,pwdInodeNumber);
 
         //printf("\n add: %u",d);
-        printf("%s\n",d->content);
+        //printf("%s\n",d->content);
         // print the content of the block
 
     }else // new bloxk needed

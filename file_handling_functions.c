@@ -14,7 +14,7 @@ char* readNbytesFromOffset(int n,int offset, char *fileSystemName)
         assert(0);
     //fgets(data,n+1,fp);
     fread(data,sizeof(char), DATA_BLOCK_SIZE, fp);
-    printf("Data in syscall :%s\n",data);
+    //printf("Data in syscall :%s\n",data);
     fclose(fp);
     return data;
 
@@ -138,13 +138,13 @@ char* readDataBlockFromFile(WholeFS*fs,  int index)
 {
 
     int offset = fs->sb.dataBlockOffset + (index * DATA_BLOCK_SIZE);
-    printf("offset %d \n", offset);
+    /* printf("offset %d \n", offset);
     printf("inode list block offset %d \n", fs->sb.iNodeOffset);
     printf("data block offset %d \n", fs->sb.dataBlockOffset);
-    printf("sizeof SUPER block offset %d \n", sizeof(SuperBlock));
+    printf("sizeof SUPER block offset %d \n", sizeof(SuperBlock)); */
 
     char* data = readNbytesFromOffset(DATA_BLOCK_SIZE,offset, fs->fileSystemName);
-    printf("Data %s \n", data);
+    //printf("Data %s \n", data);
     return data;
 }
 

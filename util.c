@@ -38,6 +38,13 @@ int readSingleRedirectDataBlock(int index,int n)
     return 0;
 }
 
+char getFileType(int fileType)
+{
+    if(fileType)
+        return 'd';
+    return '-';
+}
+
 void printDirectoryContent(WholeFS* fs,char *data,int size)
 {
     int offset = 0;
@@ -66,8 +73,7 @@ void printDirectoryContent(WholeFS* fs,char *data,int size)
         buffer = readInodeBlockFromFile(fs,inodeIndex);
         //printf("buffer : %s\n",buffer);
         inode = strToInode(buffer,sizeof(Inode));
-
-        printf("fileMode : %d ,fileSize: %d, linkCount: %d, name: %s \n",inode->fileMode,inode->fileSize,inode->linkCount,name);
+        printf("fileMode : %c ,fileSize: %d, linkCount: %d, name: %s \n",getFileType(inode->fileMode),inode->fileSize,inode->linkCount,name);
 
         offset += DIRECTORY_ENTRY_LENGTH;
     }
@@ -76,13 +82,13 @@ void printDirectoryContent(WholeFS* fs,char *data,int size)
 
 int getDataBlockIndex(WholeFS* fs, int inodeIndex, int nDataBlock)
 {
-    printf("In getDataBlockIndex\n");
+    //printf("In getDataBlockIndex\n");
     int nEntryInSingleIndirect = DATA_BLOCK_SIZE/sizeof(int);
     int nDirectDataBlock = DIRECT_DATA_BLOCK_NUMBER - 3;
     
     char *buffer = readInodeBlockFromFile(fs,inodeIndex);
     Inode *inode = strToInode(buffer,sizeof(Inode));
-    printf("Inode index : %d, DB[0] : %d\n",inodeIndex,inode->directDBIndex[0]);
+    //printf("Inode index : %d, DB[0] : %d\n",inodeIndex,inode->directDBIndex[0]);
 
 
     if(nDataBlock < nDirectDataBlock)
@@ -171,7 +177,7 @@ int getInodeIndexFromName(WholeFS *fs,char *name,int pdIndex)
         printf("This is the root inode.\n");
         return;
     }
-     */
+     
     if(inodeNo==1 || inodeNo==0)
     {
         inodeNumDigit = 1;
