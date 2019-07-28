@@ -2,6 +2,7 @@
 #include "util.h"
 #include "file_handling_functions.h"
 
+
 void system_ls(WholeFS* fs,int inodeIndex)
 {
     printf("system_ls\n");
@@ -33,7 +34,7 @@ void system_ls(WholeFS* fs,int inodeIndex)
        char *data = readDataBlockFromFile(fs,indexDataBlock);
        printf("data : %s\n",data);
        //printf("data :%s\n",readDataBlockFromFile(fs,indexDataBlock));
-       printDirectoryContent(data,DATA_BLOCK_SIZE);
+       printDirectoryContent(fs,data,inode->fileSize);
     }
 }
 
@@ -41,33 +42,48 @@ int system_cd(WholeFS* fs, char* path)
 {
     char *dir;
     int i = 0;
-    int inodeIndex = 1;
+    int inodeIndex;
     if(path[0] == '/')
     {
-        dir = strtok(path,"/:");
-        while(dir!=NULL)
-        {
-            inodeIndex = getInodeIndexFromName(fs,dir,inodeIndex);
-            if(inodeIndex == 0)
-            {
-                perror("path not found\n");
-                return -1;
-            }
-            dir = strtok(NULL,"/:");
-        }
-
-        fs->pwdInodeNumber = inodeIndex;
-        printf("PWD Inode : %d\n",inodeIndex);
-        //return 0;
+        //printf("In SYSTEM_cd.... Path : %s\n",path);
+        inodeIndex = 1;
+        dir = strsep(&path,"/");
+        dir = strsep(&path,"/");
     }
+
+    else
+    {
+        inodeIndex = fs->pwdInodeNumber;
+        dir = strsep(&path,"/");
+    }
+        
+    //printf("DIR : %s \n",dir);
+    while(dir != NULL)
+    {
+        inodeIndex = getInodeIndexFromName(fs, dir, inodeIndex);
+        //printf("DIR : %s, Inode : %d\n",dir,inodeIndex);
+        if(inodeIndex == 0)
+        {
+            perror("path not found\n");
+            return -1;
+        }
+        
+        dir = strsep(&path,"/");
+    }
+
+    fs->pwdInodeNumber = inodeIndex;
+    printf("PWD Inode : %d\n",inodeIndex);
+    
     return 0;
 }
 
 
 int system_rm(WholeFS* fs,char* name,int len)
 {
+    printf("###################################################################");
     // get current inode number of current working directory
     int dirInode = getPwdInodeNumber(fs);
+
     // get Inode of the pwd directory
     Inode* parentDirInode = getInode(fs,dirInode);
     int totalBlocksOccupied = parentDirInode->fileSize/DATA_BLOCK_SIZE;
@@ -94,20 +110,38 @@ int system_rm(WholeFS* fs,char* name,int len)
                 int dataBlockIndex = parentDirInode->directDBIndex[i];
 
                 char* buff = readDataBlockFromFile(fs,dataBlockIndex);
+                printf("b4 Buffer: %s\n",buff);
                 // read every 16 bit line from the data block and
                 // check if there is a match
-                int blockOffset = searchFilenameInDataBlock(buff,name,len);
-                if(blockOffset != -1)
+                int entryNo = searchFilenameInDataBlock(buff,name,strlen(name));
+                if(entryNo != -1)
                 {
                     // write the inode no 0 at offset
                     // inode_no filename --> 0 filename
                     // TODO
+
+                    char* entryBuffer = makeDirString(name,strlen(name),0);
+
+
+                    if(entryBuffer==NULL)
+                        assert(0);
+
+                    printf("[system_rm]Composed: %s",entryBuffer);
+                    
+                    strncpy(buff+entryNo*DIRECTORY_ENTRY_LENGTH,entryBuffer,DIRECTORY_ENTRY_LENGTH);
+
+                    /*mark inode no and corresponding data blocks free */
+
                     isFileDeleted = 1;
+                    /* */
+                    printf("after Buffer: %s\n",buff);
                     break;
                 }
             }
         }
     }
+
+    printf("###################################################################");
     if(isFileDeleted)
         return 1;  // modify if needed
     else

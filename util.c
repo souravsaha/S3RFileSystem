@@ -38,19 +38,37 @@ int readSingleRedirectDataBlock(int index,int n)
     return 0;
 }
 
-void printDirectoryContent(char *data,int size)
+void printDirectoryContent(WholeFS* fs,char *data,int size)
 {
     int offset = 0;
+    
+    char name[12], *buffer;
+    int inodeIndex;
+    Inode* inode;
+
     while(offset < size)
     {
-        int currentPosition = offset;
+        //int currentPosition = offset;
+        
+
+        // Working code
+        /* Start
         char c = data[currentPosition++];
         while(c !='\0')
         {
             printf("%c",c);
             c = data[currentPosition++];
         }
-        printf(" ");
+        End */
+         
+        sscanf(data+offset,"%d %s",&inodeIndex,name);
+        //printf("index: %d, name : %s \n",inodeIndex,name);
+        buffer = readInodeBlockFromFile(fs,inodeIndex);
+        //printf("buffer : %s\n",buffer);
+        inode = strToInode(buffer,sizeof(Inode));
+
+        printf("fileMode : %d ,fileSize: %d, linkCount: %d, name: %s \n",inode->fileMode,inode->fileSize,inode->linkCount,name);
+
         offset += DIRECTORY_ENTRY_LENGTH;
     }
 }
@@ -76,7 +94,7 @@ int getDataBlockIndex(WholeFS* fs, int inodeIndex, int nDataBlock)
 
 int getInodeIndexFromName(WholeFS *fs,char *name,int pdIndex)
 {
-    //DataBlock *currentDBBlock  = getDataBlockFromIndex(pdIndex);
+
     Inode* inode = strToInode(readInodeBlockFromFile(fs,pdIndex),sizeof(Inode));
 
     //TODO : need to do whole content, only first direct block access,
@@ -109,7 +127,7 @@ int getInodeIndexFromName(WholeFS *fs,char *name,int pdIndex)
 } */
 
 
-void testPrintDirectory()
+/* void testPrintDirectory()
 {
     char content[128];
     strcpy(content+4,"home");
@@ -121,7 +139,7 @@ void testPrintDirectory()
         content[i] ='\0';
     int size = 32;
     printDirectoryContent(content,size);
-}
+} */
 
 char* makeDirString(char* filename, int len, int inodeNo)
 {

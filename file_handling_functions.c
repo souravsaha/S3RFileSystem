@@ -137,8 +137,7 @@ char* readDataBlockFromFile(WholeFS*fs,  int index)
 }
 
 char* readInodeBlockFromFile(WholeFS*fs,  int index)
-{
-
+{   
     int offset = fs->sb.iNodeOffset + (index * sizeof(Inode));
     char* data = readNbytesFromOffset(sizeof(Inode),offset, fs->fileSystemName);
     return data;
