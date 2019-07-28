@@ -31,6 +31,7 @@
 #define FILE_NAME_STRING_SIZE 12 
 
 #define FILE_NAME "S3R.fs"
+#define MAXPATHLENGTH 100
 
 /* Define some specific offsets for file handling 
 
@@ -103,7 +104,7 @@ typedef struct WHOLEFS
     char* fileSystemName;
     DataBlock db[NO_OF_DATA_BLOCKS];
     int pwdInodeNumber;
-
+    char pwdPath[MAXPATHLENGTH];
 }WholeFS;
 
 Inode* strToInode(char* buffer,int len);
