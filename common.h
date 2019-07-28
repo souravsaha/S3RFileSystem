@@ -106,7 +106,6 @@ typedef struct WHOLEFS
 
 Inode* strToInode(char* buffer,int len);
 int getPwdInodeNumber(WholeFS* fs);
-Inode* strToInode(char* buffer,int len);
 WholeFS* readFS(char const *fileName, int* i);
 void writeInode(WholeFS* fs,int index,int mode);
 void writeDataBlock(WholeFS* fs,int index,int offset,char* content,int len);

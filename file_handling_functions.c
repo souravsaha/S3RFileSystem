@@ -65,7 +65,7 @@ void readSuperBlock(WholeFS* fs)
         fscanf(fp, "%d ", &(fs->sb.inodeList[i]));
     
     for(i = 0; i < NO_OF_DATA_BLOCKS; i++)
-        fprintf(fp, "%d ", &(fs->sb.dataBlockList[i]));
+        fscanf(fp, "%d ", &(fs->sb.dataBlockList[i]));
     
     
 

@@ -45,21 +45,53 @@ Inode* strToInode(char* buffer,int len)
     Inode* newNode = (Inode*)malloc(sizeof(Inode));
     assert(newNode!=NULL);
 
+    /* 
     sscanf(buffer,"%d ",&(newNode->fileMode));
     sscanf(buffer,"%d ",&(newNode->linkCount));
     sscanf(buffer,"%d ",&(newNode->fileSize));
 
-    int i,DBIndex;
-    for ( i = 0; i < DIRECT_DATA_BLOCK_NUMBER; i++)
+    int i;
+
+    for(i = 0; i < DIRECT_DATA_BLOCK_NUMBER; i++)
     {
         sscanf(buffer,"%d ",&(DBIndex));
         newNode->directDBIndex[i] = DBIndex;
     }
     printf("newNode fileMode : %d,linkCount : %d,DB[0]: %d\n",newNode->fileMode,newNode->linkCount,newNode->directDBIndex[0]);
 
+    */
+
+    // Returns first token 
+    char* token = strtok(buffer," "); 
+    newNode->fileMode = atoi(token);
+
+    token = strtok(NULL, " "); 
+    newNode->linkCount = atoi(token);
+
+    token = strtok(NULL, " "); 
+    newNode->fileSize = atoi(token);
+
+    // Keep printing tokens while one of the 
+    // delimiters present in str[]
+    int i=0;
+    while (i<DIRECT_DATA_BLOCK_NUMBER && token != NULL) { 
+        //printf("%s\n", token); 
+        token = strtok(NULL, " "); 
+        if(token!=NULL)
+            newNode->directDBIndex[i++] = atoi(token);
+
+    }
+    printf("newNode fileMode : %d,linkCount : %d,filesize: %d DB[0]: %d\n",newNode->fileMode,newNode->linkCount,newNode->fileSize,newNode->directDBIndex[0]);
     return newNode;
 }
-
+/*
+int main()
+{
+    char buffer[] = {"1 2 3 4 5 6 "};
+    strToInode(buffer,90);
+    return 0;
+}
+ */
 /*
 * ReadFs returns the existing structure into memory.
 * If Doesnt exist creates from scratch

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "file_handling_functions.h"
 
+
 int main(int argc, char const *argv[])
 {
     int mounted = 0; 
@@ -148,4 +149,3 @@ int main(int argc, char const *argv[])
     
     return 0;
 }
-
