@@ -40,7 +40,7 @@ void initFS(char *fileName)
 Inode* strToInode(char* buffer,int len)
 {
     
-    printf("In strToInode\n");
+    //printf("In strToInode\n");
     printf("buff : %s\n",buffer);
     Inode* newNode = (Inode*)malloc(sizeof(Inode));
     assert(newNode!=NULL);
@@ -395,9 +395,7 @@ void writeFS(WholeFS *fs, int inodeIndex)
     for(i = 0; i < DIRECT_DATA_BLOCK_NUMBER; i++)
         fprintf(fp, "%d ", fs->ib[rootInodeIndex].directDBIndex[i]);
 
-    fseek(fp, sizeof(int), SEEK_SET);
-
-    fseek(fp, fs->sb.iNodeOffset, SEEK_CUR);
+    fseek(fp, fs->sb.iNodeOffset, SEEK_SET);
     fseek(fp, inodeIndex * fs->sb.iNodeSize, SEEK_CUR);
 
     fprintf(fp, "%d ", fs->ib[inodeIndex].fileMode);
