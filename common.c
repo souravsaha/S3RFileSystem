@@ -121,7 +121,7 @@ WholeFS* readFS(char const *fileName,int* isInitialized)
     fs->fileSystemName = Malloc(512, char);
     strcpy(fs->fileSystemName, fileName);
         
-    printf("Temp Code %d\n", tmp);
+    //printf("Temp Code %d\n", tmp);
     if(tmp==code) // fresh
     {
         // super block
@@ -161,7 +161,7 @@ WholeFS* readFS(char const *fileName,int* isInitialized)
     }
     else // read from the file to memory structure
     {
-        printf("****superblock print");
+        //printf("****superblock print");
         readSuperBlock(fs);
         char *buff = readInodeBlockFromFile(fs,fs->pwdInodeNumber);
         Inode *inode = strToInode(buff,sizeof(Inode));

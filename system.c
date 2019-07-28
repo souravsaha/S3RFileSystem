@@ -102,7 +102,7 @@ void system_pwd(WholeFS *fs)
 
 int system_rm(WholeFS* fs,char* name,int len)
 {
-    printf("###################################################################");
+    //printf("###################################################################");
     // get current inode number of current working directory
     int dirInode = getPwdInodeNumber(fs);
 
@@ -158,11 +158,11 @@ int system_rm(WholeFS* fs,char* name,int len)
                     offset+= 16;
                     sscanf(buff + offset,"%d %s",&index,dirName);
                 }
-                printf("offset %d\n",findOffset);
+                //printf("offset %d\n",findOffset);
 
                 sprintf(buff+offset,"%d %s",0,name);
                 isFileDeleted = 1;
-                printf("after Buffer: %s\n",buff);
+                //printf("after Buffer: %s\n",buff);
                 writeEntireDataBlockToFile(fs,buff,dataBlockIndex);
             }
             else

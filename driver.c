@@ -112,8 +112,8 @@ int main(int argc, char const *argv[])
         }
         else if(strcmp(commandName, "rm") == 0)
         {
-            printf("Currently under development\n");
-            printf("Enter the pathname\n");
+            //printf("Currently under development\n");
+            //printf("Enter the pathname\n");
             scanf("%s", arg1);
             system_rm( fileSystem, arg1,strlen(arg1));
             //break;
