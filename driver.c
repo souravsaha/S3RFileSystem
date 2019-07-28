@@ -112,10 +112,18 @@ int main(int argc, char const *argv[])
         }
         else if(strcmp(commandName, "rm") == 0)
         {
-            printf("Currently under development\n");
+            //printf("Currently under development\n");
             printf("Enter the pathname\n");
             scanf("%s", arg1);
-            system_rm( fileSystem, arg1,strlen(arg1));
+            int res = system_rm( fileSystem, arg1,strlen(arg1));
+
+            if(res==1)
+                printf("\nDeleted!!\n");
+            else
+            {
+                printf("\nCould not Delete\n");
+            }
+            
             //break;
         }
         else if(strcmp(commandName, "ll") == 0)

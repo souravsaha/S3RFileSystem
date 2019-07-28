@@ -114,12 +114,14 @@ int system_rm(WholeFS* fs,char* name,int len)
     int totalBlocksOccupied = parentDirInode->fileSize/DATA_BLOCK_SIZE;
     if(parentDirInode->fileSize%DATA_BLOCK_SIZE != 0)
         totalBlocksOccupied++;
+
+
     // only 1st level link
     assert(totalBlocksOccupied<=DIRECT_DATA_BLOCK_NUMBER);
 
     // get the data block of the directory files
     int isFileDeleted = 0;
-    int notFound = 1;
+    int isFound = 0;
     //while(isFileDeleted == 0 )
     //{
         int i=0;
@@ -136,6 +138,14 @@ int system_rm(WholeFS* fs,char* name,int len)
                 int dataBlockIndex = parentDirInode->directDBIndex[i];
 
                 char* buff = readDataBlockFromFile(fs,dataBlockIndex);
+
+                // printf("before Buffer:\n",buff);
+                // for (int k = 0; k < 128; k++)
+                // {
+                //     printf("%c",buff[k]);
+                // }
+                // printf("\n");
+                        
 
                 int offset = 0;
                 int i, index;
@@ -158,42 +168,45 @@ int system_rm(WholeFS* fs,char* name,int len)
                     offset+= 16;
                     sscanf(buff + offset,"%d %s",&index,dirName);
                 }
-                printf("offset %d\n",findOffset);
-
-                sprintf(buff+offset,"%d %s",0,name);
-                isFileDeleted = 1;
-                printf("after Buffer: %s\n",buff);
-                writeEntireDataBlockToFile(fs,buff,dataBlockIndex);
-                // clear inode TODO
-
-                /*
-                printf("b4 Buffer: %s len=%d\n",buff,strlen(buff));
-                // read every 16 bit line from the data block and
-                // check if there is a match
-                int entryNo = searchFilenameInDataBlock(buff,name,strlen(name));
-                if(entryNo != -1)
+                // file has been found
+                if(findInode != -1)
                 {
-                    // write the inode no 0 at offset
-                    // inode_no filename --> 0 filename
-                    // TODO
+                    printf("offset %d\n",findOffset);
+                    isFound = 1;
+                    Inode* inodePtr = getInode(fs,index);
+                    if(inodePtr->fileMode == FOLDER_MODE)
+                    {
+                        printf("\n%s is a directory",name);
+                        return 0;
+                    }
+                    else
+                    {
+                        // clear inode, data blocks TODO
+                        // make a buffer with space after name
+                        char* namespace = (char*)malloc((strlen(name)+2)*sizeof(char));
+                        strcpy(namespace,name);
+                        namespace[strlen(name)]=' ';
+                        namespace[strlen(name)]='\0';
+                        
+                        sprintf(buff+offset,"%d %s",0,namespace);
+                        isFileDeleted = 1;
+                        // printf("after Buffer:\n",buff);
+                        // for (int k = 0; k < 128; k++)
+                        // {
+                        //     printf("%c",buff[k]);
+                        // }
+                        // printf("\n");
 
-                    char* entryBuffer = makeDirString(name,strlen(name),0);
+                        int k=writeEntireDataBlockToFile(fs,buff,dataBlockIndex);
+                        //printf("%d wrriten to file for rm\n",k);
+                        return 1;
+                    }
+                    
+                   
+                }
+                
 
-
-                    if(entryBuffer==NULL)
-                        assert(0);
-
-                    printf("[system_rm]Composed: %s",entryBuffer);
-                    
-                    strncpy(buff+entryNo*DIRECTORY_ENTRY_LENGTH,entryBuffer,DIRECTORY_ENTRY_LENGTH);
-                    
-                    //writeEntireDataBlockToFile(fs,buff,parentDirInode->fileSize,dataBlockIndex);
-                    writeEntireDataBlockToFile(fs,buff,dataBlockIndex);
-                    
-                    
-                    
-                   // break;
-                //}
+                
             }
             else
             {
@@ -204,11 +217,8 @@ int system_rm(WholeFS* fs,char* name,int len)
         
     //}
 
-    printf("###################################################################");
-    if(isFileDeleted)
-        return 1;  // modify if needed
-    else
-        return 0;
+    printf("\nFile Not found") ;
+    return 0;
 
 } 
 
