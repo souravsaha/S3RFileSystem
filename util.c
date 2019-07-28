@@ -70,11 +70,13 @@ void printDirectoryContent(WholeFS* fs,char *data,int size)
          
         sscanf(data+offset,"%d %s",&inodeIndex,name);
         //printf("index: %d, name : %s \n",inodeIndex,name);
-        buffer = readInodeBlockFromFile(fs,inodeIndex);
-        //printf("buffer : %s\n",buffer);
-        inode = strToInode(buffer,sizeof(Inode));
-        printf("fileMode : %c ,fileSize: %d, linkCount: %d, name: %s \n",getFileType(inode->fileMode),inode->fileSize,inode->linkCount,name);
-
+        if(inodeIndex > 0)
+        {
+            buffer = readInodeBlockFromFile(fs,inodeIndex);
+            //printf("buffer : %s\n",buffer);
+            inode = strToInode(buffer,sizeof(Inode));
+            printf("fileMode : %c ,fileSize: %d, linkCount: %d, name: %s \n",getFileType(inode->fileMode),inode->fileSize,inode->linkCount,name);
+        }
         offset += DIRECTORY_ENTRY_LENGTH;
     }
 }

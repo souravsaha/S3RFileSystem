@@ -102,7 +102,7 @@ void system_pwd(WholeFS *fs)
 
 int system_rm(WholeFS* fs,char* name,int len)
 {
-    printf("###################################################################");
+    //printf("###################################################################");
     // get current inode number of current working directory
     int dirInode = getPwdInodeNumber(fs);
 
@@ -214,8 +214,6 @@ int system_rm(WholeFS* fs,char* name,int len)
             }
             
         }
-        
-    //}
 
     printf("\nFile Not found") ;
     return 0;

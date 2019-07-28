@@ -71,14 +71,14 @@ void readSuperBlock(WholeFS* fs)
     
 
     /*print */
-    printf("inodecount: %d \n", (fs->sb.inodeCount));
-    printf("freeInode: %d \n", (fs->sb.freeInodeCount));
-    printf("inodeOfsset: %d \n", (fs->sb.iNodeOffset));
-    printf("datablockoffset %d \n", (fs->sb.dataBlockOffset));
-    printf("datablockCount %d \n", (fs->sb.dataBlockCount));
-    printf("freeDataBlockCount %d\n", (fs->sb.freeDataBlockCount));
-    printf("inodesize: %d ", (fs->sb.iNodeSize));
-    printf("datablocksize: %d ", (fs->sb.dataBlockSize));
+    //printf("inodecount: %d \n", (fs->sb.inodeCount));
+    //printf("freeInode: %d \n", (fs->sb.freeInodeCount));
+    //printf("inodeOfsset: %d \n", (fs->sb.iNodeOffset));
+    //printf("datablockoffset %d \n", (fs->sb.dataBlockOffset));
+    //printf("datablockCount %d \n", (fs->sb.dataBlockCount));
+    //printf("freeDataBlockCount %d\n", (fs->sb.freeDataBlockCount));
+    //printf("inodesize: %d ", (fs->sb.iNodeSize));
+    //printf("datablocksize: %d ", (fs->sb.dataBlockSize));
     
     fs->pwdInodeNumber = 1;
     strcpy(fs->pwdPath,"/");
