@@ -164,36 +164,6 @@ int system_rm(WholeFS* fs,char* name,int len)
                 isFileDeleted = 1;
                 printf("after Buffer: %s\n",buff);
                 writeEntireDataBlockToFile(fs,buff,dataBlockIndex);
-                // clear inode TODO
-
-                /*
-                printf("b4 Buffer: %s len=%d\n",buff,strlen(buff));
-                // read every 16 bit line from the data block and
-                // check if there is a match
-                int entryNo = searchFilenameInDataBlock(buff,name,strlen(name));
-                if(entryNo != -1)
-                {
-                    // write the inode no 0 at offset
-                    // inode_no filename --> 0 filename
-                    // TODO
-
-                    char* entryBuffer = makeDirString(name,strlen(name),0);
-
-
-                    if(entryBuffer==NULL)
-                        assert(0);
-
-                    printf("[system_rm]Composed: %s",entryBuffer);
-                    
-                    strncpy(buff+entryNo*DIRECTORY_ENTRY_LENGTH,entryBuffer,DIRECTORY_ENTRY_LENGTH);
-                    
-                    //writeEntireDataBlockToFile(fs,buff,parentDirInode->fileSize,dataBlockIndex);
-                    writeEntireDataBlockToFile(fs,buff,dataBlockIndex);
-                    
-                    
-                    
-                   // break;
-                //}
             }
             else
             {
@@ -201,10 +171,8 @@ int system_rm(WholeFS* fs,char* name,int len)
             }
             
         }
-        
-    //}
 
-    printf("###################################################################");
+    //printf("###################################################################");
     if(isFileDeleted)
         return 1;  // modify if needed
     else
