@@ -2,6 +2,7 @@
 #include "util.h"
 #include "file_handling_functions.h"
 
+
 void system_ls(WholeFS* fs,int inodeIndex)
 {
     printf("system_ls\n");
@@ -33,7 +34,7 @@ void system_ls(WholeFS* fs,int inodeIndex)
        char *data = readDataBlockFromFile(fs,indexDataBlock);
        printf("data : %s\n",data);
        //printf("data :%s\n",readDataBlockFromFile(fs,indexDataBlock));
-       printDirectoryContent(fs,data,DATA_BLOCK_SIZE);
+       printDirectoryContent(fs,data,inode->fileSize);
     }
 }
 
@@ -41,25 +42,38 @@ int system_cd(WholeFS* fs, char* path)
 {
     char *dir;
     int i = 0;
-    int inodeIndex = 1;
+    int inodeIndex;
     if(path[0] == '/')
     {
-        dir = strtok(path,"/:");
-        while(dir!=NULL)
-        {
-            inodeIndex = getInodeIndexFromName(fs,dir,inodeIndex);
-            if(inodeIndex == 0)
-            {
-                perror("path not found\n");
-                return -1;
-            }
-            dir = strtok(NULL,"/:");
-        }
-
-        fs->pwdInodeNumber = inodeIndex;
-        printf("PWD Inode : %d\n",inodeIndex);
-        //return 0;
+        //printf("In SYSTEM_cd.... Path : %s\n",path);
+        inodeIndex = 1;
+        dir = strsep(&path,"/");
+        dir = strsep(&path,"/");
     }
+
+    else
+    {
+        inodeIndex = fs->pwdInodeNumber;
+        dir = strsep(&path,"/");
+    }
+        
+    //printf("DIR : %s \n",dir);
+    while(dir != NULL)
+    {
+        inodeIndex = getInodeIndexFromName(fs, dir, inodeIndex);
+        //printf("DIR : %s, Inode : %d\n",dir,inodeIndex);
+        if(inodeIndex == 0)
+        {
+            perror("path not found\n");
+            return -1;
+        }
+        
+        dir = strsep(&path,"/");
+    }
+
+    fs->pwdInodeNumber = inodeIndex;
+    printf("PWD Inode : %d\n",inodeIndex);
+    
     return 0;
 }
 

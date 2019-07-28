@@ -48,7 +48,7 @@ void printDirectoryContent(WholeFS* fs,char *data,int size)
 
     while(offset < size)
     {
-        int currentPosition = offset;
+        //int currentPosition = offset;
         
 
         // Working code
@@ -62,9 +62,9 @@ void printDirectoryContent(WholeFS* fs,char *data,int size)
         End */
          
         sscanf(data+offset,"%d %s",&inodeIndex,name);
-        printf("index: %d, name : %s \n",inodeIndex,name);
+        //printf("index: %d, name : %s \n",inodeIndex,name);
         buffer = readInodeBlockFromFile(fs,inodeIndex);
-        printf("buffer : %s\n",buffer);
+        //printf("buffer : %s\n",buffer);
         inode = strToInode(buffer,sizeof(Inode));
 
         printf("fileMode : %d ,fileSize: %d, linkCount: %d, name: %s \n",inode->fileMode,inode->fileSize,inode->linkCount,name);
@@ -94,7 +94,7 @@ int getDataBlockIndex(WholeFS* fs, int inodeIndex, int nDataBlock)
 
 int getInodeIndexFromName(WholeFS *fs,char *name,int pdIndex)
 {
-    //DataBlock *currentDBBlock  = getDataBlockFromIndex(pdIndex);
+
     Inode* inode = strToInode(readInodeBlockFromFile(fs,pdIndex),sizeof(Inode));
 
     //TODO : need to do whole content, only first direct block access,
