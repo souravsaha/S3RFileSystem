@@ -27,6 +27,8 @@
 #define Malloc(n,type) (type *) malloc( (unsigned) ((n)*sizeof(type)))
 
 #define DIRECTORY_ENTRY_LENGTH 16
+#define INODE_NO_STRING_SIZE 4
+#define FILE_NAME_STRING_SIZE 12 
 
 #define FILE_NAME "S3R.fs"
 

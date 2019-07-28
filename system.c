@@ -80,8 +80,10 @@ int system_cd(WholeFS* fs, char* path)
 
 int system_rm(WholeFS* fs,char* name,int len)
 {
+    printf("###################################################################");
     // get current inode number of current working directory
     int dirInode = getPwdInodeNumber(fs);
+
     // get Inode of the pwd directory
     Inode* parentDirInode = getInode(fs,dirInode);
     int totalBlocksOccupied = parentDirInode->fileSize/DATA_BLOCK_SIZE;
@@ -108,20 +110,38 @@ int system_rm(WholeFS* fs,char* name,int len)
                 int dataBlockIndex = parentDirInode->directDBIndex[i];
 
                 char* buff = readDataBlockFromFile(fs,dataBlockIndex);
+                printf("b4 Buffer: %s\n",buff);
                 // read every 16 bit line from the data block and
                 // check if there is a match
-                int blockOffset = searchFilenameInDataBlock(buff,name,len);
-                if(blockOffset != -1)
+                int entryNo = searchFilenameInDataBlock(buff,name,strlen(name));
+                if(entryNo != -1)
                 {
                     // write the inode no 0 at offset
                     // inode_no filename --> 0 filename
                     // TODO
+
+                    char* entryBuffer = makeDirString(name,strlen(name),0);
+
+
+                    if(entryBuffer==NULL)
+                        assert(0);
+
+                    printf("[system_rm]Composed: %s",entryBuffer);
+                    
+                    strncpy(buff+entryNo*DIRECTORY_ENTRY_LENGTH,entryBuffer,DIRECTORY_ENTRY_LENGTH);
+
+                    /*mark inode no and corresponding data blocks free */
+
                     isFileDeleted = 1;
+                    /* */
+                    printf("after Buffer: %s\n",buff);
                     break;
                 }
             }
         }
     }
+
+    printf("###################################################################");
     if(isFileDeleted)
         return 1;  // modify if needed
     else
@@ -213,3 +233,82 @@ int system_mkdir(WholeFS* fs,char* name, int fileType)
     int inode = system_touch(fs, appendedFolderName, fileType);
     return inode;
 }
+
+/* 
+void system_cp(WholeFS *fs, char* copyFrom, char* copyTo)
+{
+
+    FILE *fp = fopen("S3R.fs", "r+");
+
+    int currentInodeIndex, newInodeIndex;
+    currentInodeIndex = getParentInode(copyFrom);
+    newInodeIndex = getInodeFromPath(copyTo);
+    int i, inodeNum;
+    char name[500], dirName[500] = "root";
+    char *inodeStr = (char*)malloc(100*sizeof(char));
+
+    strcpy(name, getName(copyFrom));
+
+    int* DBindex = (int *)malloc(sizeof(int));
+    int* offset = (int *)malloc(sizeof(int));
+    Inode* i = (Inode*)malloc(sizeof(Inode));
+
+    strcpy(inodeStr,readInodeBlockFromFile(fs, currentInodeIndex));
+    i = strToInode(inodeStr,strlen(inodeStr));
+    calculateDataBlockNoAndOffsetToWrite(fs, i, currentInodeIndex, DBindex, offset);
+
+    fseek(fp, sizeof(int), SEEK_SET);
+    fseek(fp, fs->sb.dataBlockOffset, SEEK_CUR);
+    fseek(fp, DBindex, SEEK_CUR);
+    fseek(fp, offset , SEEK_CUR);
+    fscanf(fp, "%d %s", &inodeNum,dirName);
+
+
+    int dbOffset = fs->ib[newInodeIndex].fileSize % DATA_BLOCK_SIZE;
+    fseek(fp, sizeof(int), SEEK_SET);
+    fseek(fp, fs->sb.dataBlockOffset, SEEK_CUR);
+    fseek(fp, getDBlockNumberFromSize(fs->ib[newInodeIndex].fileSize) * DATA_BLOCK_SIZE, SEEK_CUR);
+    fseek(fp, dbOffset , SEEK_CUR);
+    fprintf(fp, "%d %s", inodeNum, dirName);
+}
+
+void system_mv(WholeFS *fs, char* moveFrom, char* moveTo)
+{
+    
+    FILE *fp = fopen("S3R.fs", "r+");
+
+    int currentInodeIndex, newInodeIndex;
+    currentInodeIndex = getParentInode(moveFrom);
+    newInodeIndex = getInodeFromPath(moveTo);
+    int i, inodeNum;
+    char name[500], dirName[500];
+    char *inodeStr = (char*)malloc(100*sizeof(char));
+    
+    strcpy(name, getName(moveFrom));
+
+    int* DBindex = (int *)malloc(sizeof(int));
+    int* offset = (int *)malloc(sizeof(int));
+    Inode* i = (Inode*)malloc(sizeof(Inode));
+
+    strcpy(inodeStr,readInodeBlockFromFile(fs, currentInodeIndex));
+    i = strToInode(inodeStr,strlen(inodeStr));
+    calculateDataBlockNoAndOffsetToWrite(fs, i, currentInodeIndex, DBindex, offset);
+
+    //fseek(fp, sizeof(int), SEEK_SET);  
+    fseek(fp, fs->sb.dataBlockOffset, SEEK_SET);
+    fseek(fp, DBindex, SEEK_CUR);
+    fseek(fp, offset , SEEK_CUR);
+    fscanf(fp, "%d %s", &inodeNum,dirName);
+
+    fseek(fp, sizeof(int) + fs->sb.dataBlockOffset + DBindex + offset, SEEK_SET);
+    fprintf(fp, "%d", 0);
+
+    int dbOffset = fs->ib[newInodeIndex].fileSize % DATA_BLOCK_SIZE;
+    fseek(fp, sizeof(int), SEEK_SET);
+    fseek(fp, fs->sb.dataBlockOffset, SEEK_CUR);
+    fseek(fp, getDBlockNumberFromSize(fs->ib[newInodeIndex].fileSize) * DATA_BLOCK_SIZE, SEEK_CUR);
+    fseek(fp, dbOffset , SEEK_CUR);
+    fprintf(fp, "%d %s", inodeNum, dirName);
+
+}
+*/
