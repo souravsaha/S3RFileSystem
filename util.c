@@ -123,6 +123,65 @@ void testPrintDirectory()
     printDirectoryContent(content,size);
 }
 
+char* makeDirString(char* filename, int len, int inodeNo)
+{
+    int i, j, inodeNumDigit=0;
+    char* buffer = (char*)malloc((INODE_NO_STRING_SIZE + FILE_NAME_STRING_SIZE)*sizeof(char));
+    //int len = strlen(filename);
+
+    int copyInode = inodeNo;
+    while (copyInode!=0)
+    {
+        inodeNumDigit ++;
+        copyInode /= 10;
+    }
+    assert(inodeNo>=0);
+    assert(inodeNumDigit<=INODE_NO_STRING_SIZE);
+    assert(len<=FILE_NAME_STRING_SIZE);
+    //printf("inode digits: %d\n",inodeNumDigit);
+
+    if (inodeNo==0)
+    {
+        printf("This inode is invalid.\n");
+        return;
+    }
+
+    if (inodeNo==1)
+    {
+        printf("This is the root inode.\n");
+        return;
+    }
+    copyInode = inodeNo;
+    for (i=inodeNumDigit-1; i>=0; i--)
+    {
+        buffer[i] = (copyInode%10)+'0';
+        //printf("%c\n",buffer[i]);
+        copyInode /= 10;
+    }
+
+    for (i=inodeNumDigit; i<INODE_NO_STRING_SIZE; i++)
+    {
+        buffer[i] = '*';
+        //printf("%c\n",buffer[i]);
+    }
+    int k=0;
+    for (i=INODE_NO_STRING_SIZE; i<INODE_NO_STRING_SIZE + len; i++)
+    {
+        buffer[i] = filename[k];
+        //printf("%c\n",buffer[i]);
+        k++;
+    }
+    for (i = INODE_NO_STRING_SIZE + len; i < INODE_NO_STRING_SIZE + FILE_NAME_STRING_SIZE; i++)
+    {
+        buffer[i] =  '*';
+        //printf("%c\n",buffer[i]);
+    }
+    printf("%s", buffer);
+    return buffer;
+}
+
+
+
 /*
 int main(int argc, char const *argv[])
 {
