@@ -266,6 +266,7 @@ int isDBlockFree(Inode* i,int index)
 }
 // calculate block number and offset to write data into
 // if ending of the block is reached new block allocated
+// TODO remove unused inodeIndex param
 void calculateDataBlockNoAndOffsetToWrite(WholeFS* fs,Inode* i,int inodeIndex, int* index,int* offset)
 {
     int blockIndexInInode = i->fileSize/DATA_BLOCK_SIZE;

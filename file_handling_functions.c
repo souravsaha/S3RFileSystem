@@ -108,6 +108,16 @@ int writeDataBlockToFile(WholeFS*fs,char* blockBuffer,int existingFileSize,  int
     return byteWritten;
 }
 
+// write in a data block at some offset
+int appendNbytesInDataBlockToFile(WholeFS*fs,char* blockBuffer,int off,  int index,int n)
+{
+    // actual offset to write
+    int offset = fs->sb.dataBlockOffset + (index * DATA_BLOCK_SIZE) + off;
+
+    int byteWritten = writeNBytesToOffset(blockBuffer,n,offset, fs->fileSystemName);
+    return byteWritten;
+}
+
 // write entire data block to file
 int writeEntireDataBlockToFile(WholeFS*fs,char* blockBuffer,  int index)
 {
@@ -161,4 +171,24 @@ char* readSuperBlockFromFile(WholeFS*fs)
     int offset = sizeof(int);
     char* data = readNbytesFromOffset(sizeof(SuperBlock),offset, fs->fileSystemName);
     return data;
+}
+
+int writeInodeToFile(WholeFS* fs,Inode* inode,int inodeIndex)
+{
+    FILE* fp = fopen(fs->fileSystemName,"r+");
+
+    fseek(fp, fs->sb.iNodeOffset, SEEK_SET);
+    fseek(fp, inodeIndex * fs->sb.iNodeSize, SEEK_CUR);
+
+    fprintf(fp, "%d ", inode->fileMode);
+    fprintf(fp, "%d ", inode->linkCount);
+    fprintf(fp, "%d ", inode->fileSize);
+
+
+    //printf("Inode WriteFS : %d, DB[0]: %d\n",inodeIndex,inode->directDBIndex[0]);
+    int i;
+    for(i = 0; i<DIRECT_DATA_BLOCK_NUMBER; i++)
+        fprintf(fp, "%d ", inode->directDBIndex[i]);
+
+    fclose(fp);
 }
