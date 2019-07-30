@@ -58,7 +58,7 @@ int main(int argc, char const *argv[])
         printf(">> \n");
         printf("cd \t cp \t mv \t ls \t put\n");
         printf("get \t rm \t ll \t cat \t touch\n");
-        printf("pwd \t unmount \t mkdir\n");
+        printf("pwd \t unmount \t mkdir\t cat > <filename>\n");
         scanf("%s", commandName);
         
         if (strcmp(commandName, "cd") == 0)
@@ -134,9 +134,16 @@ int main(int argc, char const *argv[])
         }
         else if(strcmp(commandName, "cat") == 0)
         {
-            printf("Currently under development\n");
+            //printf("Currently under development\n");
             //printf("Enter the filename\n");
-            //scanf("%s", arg1);
+            scanf("%s", arg1);
+            if(strcmp(arg1,">")==0)
+            {
+                //printf("inside");
+                scanf("%s",arg2);
+                system_cat(fileSystem,arg2,1);
+            }else
+                system_cat(fileSystem,arg1,0);
             //system_cat( fileSystem, arg1);
             //break;
         }

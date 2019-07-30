@@ -16,4 +16,7 @@
     void readSuperBlock(WholeFS* fs);
     void writeSuperBlock(WholeFS* fs);
     int writeEntireDataBlockToFile(WholeFS*fs,char* blockBuffer,  int index);
+    int appendNbytesInDataBlockToFile(WholeFS*fs,char* blockBuffer,int off,  int index,int n);
+    int writeInodeToFile(WholeFS* fs,Inode* inode,int inodeIndex);
+    
 #endif

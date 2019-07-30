@@ -108,7 +108,15 @@ int system_rm(WholeFS* fs,char* name,int len)
 
     
     // get Inode of the pwd directory
-    Inode* parentDirInode = getInode(fs,dirInode);
+    //Inode* parentDirInode = getInode(fs,dirInode); 
+
+    char *data = readInodeBlockFromFile(fs,dirInode);
+    if(strlen(data) == 0) // empty
+    {
+        //printf("Empty Directory\n");
+        assert(0);
+    }
+    Inode* parentDirInode = strToInode(data,sizeof(Inode));
 
     // calculate no of data blocks for parent dir
     int totalBlocksOccupied = parentDirInode->fileSize/DATA_BLOCK_SIZE;
@@ -171,9 +179,18 @@ int system_rm(WholeFS* fs,char* name,int len)
                 // file has been found
                 if(findInode != -1)
                 {
-                    printf("offset %d\n",findOffset);
+                    //printf("offset %d\n",findOffset);
                     isFound = 1;
-                    Inode* inodePtr = getInode(fs,index);
+                    
+                    //Inode* inodePtr = getInode(fs,index);
+                    char *data = readInodeBlockFromFile(fs,findInode);
+                    if(strlen(data) == 0) // empty
+                    {
+                        //printf("Empty Directory\n");
+                        assert(0);
+                    }
+                    Inode* inodePtr = strToInode(data,sizeof(Inode));
+
                     if(inodePtr->fileMode == FOLDER_MODE)
                     {
                         printf("\n%s is a directory",name);
@@ -182,6 +199,33 @@ int system_rm(WholeFS* fs,char* name,int len)
                     else
                     {
                         // clear inode, data blocks TODO
+                        // mark all data blocks free
+                        int dataBlocksAllocated = inodePtr->fileSize/DATA_BLOCK_SIZE;
+                        if(inodePtr->fileSize%DATA_BLOCK_SIZE)
+                            dataBlocksAllocated++;
+                        
+                        // mark data blocks free
+                        int i;
+                        char* nullBuffer = calloc(DATA_BLOCK_SIZE,sizeof(char));
+                        for(i=0;i<dataBlocksAllocated;i++)
+                        {
+                            // write null to data blocks
+                            writeEntireDataBlockToFile(fs,nullBuffer,inodePtr->directDBIndex[i]);
+                            // mark the block free
+                            fs->sb.dataBlockList[inodePtr->directDBIndex[i]] = FREE;
+                        }
+                        // TODO write empty string to data block
+
+                        // mark corresponding inodes free
+                        fs->sb.inodeList[findInode] = FREE;
+
+                        // other superblock adjustments
+                        fs->sb.freeDataBlockCount+=dataBlocksAllocated;
+                        fs->sb.freeInodeCount += 1;
+
+                        // write superblock
+                        writeSuperBlock(fs);
+
                         // make a buffer with space after name
                         char* namespace = (char*)malloc((strlen(name)+2)*sizeof(char));
                         strcpy(namespace,name);
@@ -220,6 +264,7 @@ int system_rm(WholeFS* fs,char* name,int len)
 
 } 
 
+char catBuffer[1000000];
 
 int system_touch(WholeFS* fs,char* name, int fileType)
 {
@@ -242,6 +287,7 @@ int system_touch(WholeFS* fs,char* name, int fileType)
     //printf("Before touch : %d\n",fs->ib[parent].fileSize);
     // write into data block of parent
     // assuming everything is in direct block
+    
     Inode* parentInode = getInode(fs,parent);
 
     /* This is a temporary solution..
@@ -252,7 +298,9 @@ int system_touch(WholeFS* fs,char* name, int fileType)
      */
 
     int blockNo,blockOffset;
-
+    
+    // TODO inodeIndex is wrongly passed but it is not used so not affecting 
+    // should pass parentInodeIndex
     calculateDataBlockNoAndOffsetToWrite(fs,parentInode,inodeIndex, &blockNo,&blockOffset);
 
     assert(blockNo<DIRECT_DATA_BLOCK_NUMBER);
@@ -293,6 +341,104 @@ int system_touch(WholeFS* fs,char* name, int fileType)
     return inodeIndex;
 
 
+}
+
+int system_cat(WholeFS* fs,char* name,int mode)
+{
+    if(mode==0) // read mode
+    {
+        int inodeIndex = getInodeIndexFromName(fs, name, getPwdInodeNumber(fs));
+        
+        // get inode
+        char *data = readInodeBlockFromFile(fs,inodeIndex);
+        if(strlen(data) == 0) // empty
+        {
+            //printf("Empty Directory\n");
+            assert(0);
+        }
+        Inode* in = strToInode(data,sizeof(Inode));
+        
+        //Inode* in = getInode(fs,inodeIndex);
+
+        //printf("inodeIndex = %d\n",inodeIndex);
+
+        int noDataBlocks = in->fileSize/DATA_BLOCK_SIZE;
+        if(in->fileSize%DATA_BLOCK_SIZE)
+            noDataBlocks++;
+
+        //printf("noDataBlocks = %d\n",noDataBlocks);
+        int i;
+        for ( i = 0; i < noDataBlocks; i++)
+        {
+            int dataBlockIndex = in->directDBIndex[i];
+            //printf("DB Index: %d\n",dataBlockIndex);
+            char* buff =readDataBlockFromFile(fs,dataBlockIndex);
+            /*print contents */
+            int j;
+            printf("\n");
+            for ( j = 0; j < DATA_BLOCK_SIZE; j++)
+            {
+                printf("%c",buff[j]);
+            }
+            printf("\n");
+        }
+        
+    }else // write mode
+    {
+        // TODO check if file already exists
+        //
+        //int inodeNo = system_touch(fs,name,FILE_MODE);
+        printf("\nPlease Write the contents press ctrl+D twice when you are done>>\n");
+
+        char ch=getchar();
+        int idx = 0;
+        while(ch!=EOF){
+            catBuffer[idx++] = ch;
+            ch=getchar();
+        }
+        catBuffer[idx] = 0; // end with null
+        //printf("%s",catBuffer);
+        
+        int inodeNo = system_touch(fs,name,FILE_MODE);
+        //Inode* in = getInode(fs,inodeNo);
+        // get inode
+        char *data = readInodeBlockFromFile(fs,inodeNo);
+        if(strlen(data) == 0) // empty
+        {
+            //printf("Empty Directory\n");
+            assert(0);
+
+        }
+        Inode* in = strToInode(data,sizeof(Inode));
+
+        
+        char* ptr = catBuffer;
+        int blockNo=-1,blockOffset = -1;
+        
+        int toWrite = idx;
+        
+        while(toWrite>0)
+        { 
+            calculateDataBlockNoAndOffsetToWrite(fs,in,0, &blockNo,&blockOffset);
+            int emptyInThisBlock = DATA_BLOCK_SIZE - blockOffset;
+            int contentSizeToWrite = toWrite<emptyInThisBlock ? toWrite:emptyInThisBlock;
+            //printf("towrite: %d emptyInThisBlock: %d blockNo: %d offset:%d\n",toWrite,emptyInThisBlock,blockNo,blockOffset);
+
+            int n = appendNbytesInDataBlockToFile(fs,ptr,blockOffset,  blockNo,contentSizeToWrite);
+            if(n!=contentSizeToWrite)
+                assert(0);
+            
+            // increment ptr and filesize decrease toWrite
+            ptr+=contentSizeToWrite;
+            in->fileSize+=contentSizeToWrite;
+            toWrite -= contentSizeToWrite;
+            
+        }
+        // write inode
+        writeInodeToFile(fs,in,inodeNo);
+        // write superblock
+        writeSuperBlock(fs);
+    }
 }
 
 int system_mkdir(WholeFS* fs,char* name, int fileType)
