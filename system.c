@@ -108,7 +108,15 @@ int system_rm(WholeFS* fs,char* name,int len)
 
     
     // get Inode of the pwd directory
-    Inode* parentDirInode = getInode(fs,dirInode);
+    //Inode* parentDirInode = getInode(fs,dirInode); 
+
+    char *data = readInodeBlockFromFile(fs,dirInode);
+    if(strlen(data) == 0) // empty
+    {
+        //printf("Empty Directory\n");
+        assert(0);
+    }
+    Inode* parentDirInode = strToInode(data,sizeof(Inode));
 
     // calculate no of data blocks for parent dir
     int totalBlocksOccupied = parentDirInode->fileSize/DATA_BLOCK_SIZE;
@@ -173,7 +181,16 @@ int system_rm(WholeFS* fs,char* name,int len)
                 {
                     //printf("offset %d\n",findOffset);
                     isFound = 1;
-                    Inode* inodePtr = getInode(fs,index);
+                    
+                    //Inode* inodePtr = getInode(fs,index);
+                    char *data = readInodeBlockFromFile(fs,findInode);
+                    if(strlen(data) == 0) // empty
+                    {
+                        //printf("Empty Directory\n");
+                        assert(0);
+                    }
+                    Inode* inodePtr = strToInode(data,sizeof(Inode));
+
                     if(inodePtr->fileMode == FOLDER_MODE)
                     {
                         printf("\n%s is a directory",name);
@@ -189,8 +206,16 @@ int system_rm(WholeFS* fs,char* name,int len)
                         
                         // mark data blocks free
                         int i;
+                        char* nullBuffer = calloc(DATA_BLOCK_SIZE,sizeof(char));
                         for(i=0;i<dataBlocksAllocated;i++)
+                        {
+                            // write null to data blocks
+                            writeEntireDataBlockToFile(fs,nullBuffer,inodePtr->directDBIndex[i]);
+                            // mark the block free
                             fs->sb.dataBlockList[inodePtr->directDBIndex[i]] = FREE;
+                        }
+                        // TODO write empty string to data block
+
                         // mark corresponding inodes free
                         fs->sb.inodeList[findInode] = FREE;
 
@@ -262,6 +287,7 @@ int system_touch(WholeFS* fs,char* name, int fileType)
     //printf("Before touch : %d\n",fs->ib[parent].fileSize);
     // write into data block of parent
     // assuming everything is in direct block
+    
     Inode* parentInode = getInode(fs,parent);
 
     /* This is a temporary solution..
@@ -322,17 +348,30 @@ int system_cat(WholeFS* fs,char* name,int mode)
     if(mode==0) // read mode
     {
         int inodeIndex = getInodeIndexFromName(fs, name, getPwdInodeNumber(fs));
-        Inode* in = getInode(fs,inodeIndex);
-
         
+        // get inode
+        char *data = readInodeBlockFromFile(fs,inodeIndex);
+        if(strlen(data) == 0) // empty
+        {
+            //printf("Empty Directory\n");
+            assert(0);
+        }
+        Inode* in = strToInode(data,sizeof(Inode));
+        
+        //Inode* in = getInode(fs,inodeIndex);
+
+        //printf("inodeIndex = %d\n",inodeIndex);
+
         int noDataBlocks = in->fileSize/DATA_BLOCK_SIZE;
         if(in->fileSize%DATA_BLOCK_SIZE)
             noDataBlocks++;
 
+        //printf("noDataBlocks = %d\n",noDataBlocks);
         int i;
         for ( i = 0; i < noDataBlocks; i++)
         {
             int dataBlockIndex = in->directDBIndex[i];
+            //printf("DB Index: %d\n",dataBlockIndex);
             char* buff =readDataBlockFromFile(fs,dataBlockIndex);
             /*print contents */
             int j;
@@ -361,12 +400,23 @@ int system_cat(WholeFS* fs,char* name,int mode)
         //printf("%s",catBuffer);
         
         int inodeNo = system_touch(fs,name,FILE_MODE);
-        Inode* in = getInode(fs,inodeNo);
+        //Inode* in = getInode(fs,inodeNo);
+        // get inode
+        char *data = readInodeBlockFromFile(fs,inodeNo);
+        if(strlen(data) == 0) // empty
+        {
+            //printf("Empty Directory\n");
+            assert(0);
+
+        }
+        Inode* in = strToInode(data,sizeof(Inode));
+
         
         char* ptr = catBuffer;
         int blockNo=-1,blockOffset = -1;
         
         int toWrite = idx;
+        
         while(toWrite>0)
         { 
             calculateDataBlockNoAndOffsetToWrite(fs,in,0, &blockNo,&blockOffset);
@@ -386,6 +436,8 @@ int system_cat(WholeFS* fs,char* name,int mode)
         }
         // write inode
         writeInodeToFile(fs,in,inodeNo);
+        // write superblock
+        writeSuperBlock(fs);
     }
 }
 
