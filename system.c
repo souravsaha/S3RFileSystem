@@ -42,6 +42,9 @@ void system_ls(WholeFS* fs,int inodeIndex)
 
 int system_cd(WholeFS* fs, char* _path)
 {
+    int code;
+    FILE *fp = fopen(fs->fileSystemName, "r");
+    fscanf(fp,"%d ",&code);
     char *path = Malloc(strlen(_path),char);
     strcpy(path,_path); 
     char *dir;
@@ -90,7 +93,20 @@ int system_cd(WholeFS* fs, char* _path)
         strcat(fs->pwdPath,_path);
     } 
     printf("Path : %s \n",fs->pwdPath);
-    
+    /* Load inode content from file
+     whenever changing directory load content of inode data structure, 
+     there could be a small bug as it will fetch everytime we are doing cd */
+    if(code == FILE_SYSTEM_ALREADY_INITIALIZED)
+    {
+        //printf("Loading Inode from file \n");
+        // after mounting, load content of inode data structure
+        char *buff = readInodeBlockFromFile(fs,fs->pwdInodeNumber);
+        Inode *inode = strToInode(buff,sizeof(Inode));
+        fs->ib[fs->pwdInodeNumber].fileMode = inode->fileMode;
+        fs->ib[fs->pwdInodeNumber].linkCount = inode->linkCount;
+        fs->ib[fs->pwdInodeNumber].directDBIndex[0] =inode->directDBIndex[0];
+        fs->ib[fs->pwdInodeNumber].fileSize = inode->fileSize;
+    }
     return 0;
 }
 
@@ -289,7 +305,17 @@ int system_touch(WholeFS* fs,char* name, int fileType)
     // assuming everything is in direct block
     
     Inode* parentInode = getInode(fs,parent);
-
+    //printf("Parent Inode number i : %d\n",parent);
+    //printf("pwdInode Number %d ", fs->pwdInodeNumber);
+    //int i;
+    //printf("fileMode : %d", parentInode->fileMode);
+    //for( i = 0; i < DIRECT_DATA_BLOCK_NUMBER; i++)
+    //{
+        /* code */
+    //    printf("%d ", parentInode->directDBIndex[i]);
+    //}
+    //printf("\n");
+    
     /* This is a temporary solution..
         Write a function like write buffer that uses a while loop to write data to
         data buffers where data may not fit in a single data block
